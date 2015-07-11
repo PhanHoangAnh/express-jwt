@@ -19,6 +19,10 @@ router.get('/', function(req, res, next) {
     });
 });
 
+router.get('/setup', function(req, res, next) {
+    res.render('registry');
+});
+
 
 /// setup new user
 router.post('/setup', check_isExisted, function(req, res, next) {
@@ -144,7 +148,7 @@ function check_isExisted(req, res, next) {
 
 
 // router.get('/testToken',Auth,function(req,res,next){
-// 	res.render('Index', {
+//  res.render('Index', {
 //         title: 'Authenticated..:D...wellcome with token with Get Method'
 //     });
 // });
