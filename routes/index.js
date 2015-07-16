@@ -5,44 +5,34 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
 var User = require('../models/user');
-var NodeRSA = require('node-rsa');
-var key = new NodeRSA({
-    b: 2048
-});
 
-router.superSecret = config.secret;
 
-console.log('GenRSAKeyPair....')
 
-var keyPair = {
-    'publicKey': key.exportKey('pkcs8-public-pem'),
-    'privateKey': key.exportKey('pkcs1-pem')
-};
+
+//console.log('GenRSAKeyPair....')
+
+
+var fs = require('fs');
+//var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
+
 
 mongoose.connect(config.database, function() {
-        console.log(" mongodb is connected");
+    console.log(" mongodb is connected");
 })
 
-
-router.get('/RSAPub',function(req,res,next){
-    res.send(keyPair.publicKey);
-});
-
-    /* GET home page. */
+/* GET home page. */
 router.get('/', function(req, res, next) {
     res.render('index', {
         title: 'Express'
     });
 });
 
-// Add pem key before send back
-function AddPublicKey(req, res, next) {
-    res.header('X-PublicKey-PEM', 'dasfsadfsaf dfaasdfsadfasfd asfdasfasfdasf asdfasf asfdasfd asfdfasdfasd safasdfasdfdasfasdsadf');
-    next();
-}
+router.post('/check',function(req,res,next){
+    
+});
 
-router.get('/setup', AddPublicKey, function(req, res, next) {
-    res.render('registry');
+router.get('/setup', function(req, res, next) {
+    res.render('registry');;    
 });
 
 
