@@ -4,8 +4,9 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-var User = require('../models/user');
 
+var cryptico = require('cryptico');
+var User = require('../models/user');
 
 
 
@@ -13,11 +14,30 @@ var User = require('../models/user');
 
 
 var fs = require('fs');
-//var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
+var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
+
+//console.log(keyPair);
 
 
-mongoose.connect(config.database, function() {
-    console.log(" mongodb is connected");
+mongoose.connect(config.database, function(error) {
+    console.log(" mongodb is connecting...");
+    if (error){
+         throw error; // Handle failed connection
+    }
+    console.log('conn ready:  '+ mongoose.connection.readyState);
+      
+})
+
+router.use(function(req,res,next){
+    // console.log('conn ready:  '+ mongoose.connection.readyState);
+    // next();
+    if(mongoose.connection.readyState == 0){
+        var err = new Error('Database Error');
+        err.status = 503;
+        next(err);
+    }
+    next();
+
 })
 
 /* GET home page. */
@@ -27,12 +47,14 @@ router.get('/', function(req, res, next) {
     });
 });
 
-router.post('/check',function(req,res,next){
-    
+router.post('/check', function(req, res, next) {
+
 });
 
 router.get('/setup', function(req, res, next) {
-    res.render('registry');;    
+    res.render('registry', {
+        data: keyPair.public
+    });;
 });
 
 
@@ -64,14 +86,22 @@ router.get('/users', function(req, res) {
 });
 
 // route to authenticate a user (POST http://localhost:8080/api/authenticate)
-router.post('/authenticate', function(req, res) {
+router.post('/authenticate', decrypt_Request, function(req, res) {
 
+console.log(req.body.username);
+console.log(req.body.password);
+    
     // find the user
     User.findOne({
         name: req.body.username
     }, function(err, user) {
 
-        if (err) throw err;
+        if (err){
+
+          console.log("Error:-----------: ", err);
+          throw err;
+            
+        } 
 
         if (!user) {
             res.json({
@@ -108,8 +138,14 @@ router.post('/authenticate', function(req, res) {
     });
 });
 
+router.use('/testToken', Auth, function(req, res, next) {
+    var member = req.decoded.name;
+    res.render('Index', {
+        title: 'Authenticated..:D...Hello ' + member + '  with token with ' + req.method
+    });
+});
 
-var Auth = function(req, res, next) {
+function Auth(req, res, next) {
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
@@ -159,16 +195,26 @@ function check_isExisted(req, res, next) {
 };
 
 
-// router.get('/testToken',Auth,function(req,res,next){
-//  res.render('Index', {
-//         title: 'Authenticated..:D...wellcome with token with Get Method'
-//     });
-// });
+function decrypt_Request(req, res, next) {
+    var RSAKey = cryptico.RSAKey.parse(JSON.stringify(keyPair.private));
+    var encrypt_Request = req.body.data;
+    //console.log("encrypted request: ", req.body.data);
+    var DecryptionResult = cryptico.decrypt(encrypt_Request, RSAKey);
+    var DecryptRSA = JSON.parse(DecryptionResult.plaintext);
 
-router.use('/testToken', Auth, function(req, res, next) {
-    var member = req.decoded.name;
-    res.render('Index', {
-        title: 'Authenticated..:D...Hello ' + member + '  with token with ' + req.method
-    });
-});
+    var aes_key = DecryptRSA.key;
+    var aes_userName = DecryptRSA.userName;
+    var aes_password = DecryptRSA.password;
+
+    var userName = cryptico.decryptAESCBC(aes_userName, aes_key);
+    //console.log('userName: ', userName);
+    var password = cryptico.decryptAESCBC(aes_password, aes_key);
+    //console.log('password: ', password);
+
+    req.body.username = userName ;
+    req.body.password = password ;
+    next();
+}
+
+
 module.exports = router;
