@@ -16,7 +16,7 @@ var User = require('../models/user');
 var fs = require('fs');
 var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
 
-//console.log(keyPair);
+console.log(keyPair);
 
 
 mongoose.connect(config.database, function(error) {
@@ -27,6 +27,7 @@ mongoose.connect(config.database, function(error) {
     console.log('conn ready:  '+ mongoose.connection.readyState);
       
 })
+
 
 router.use(function(req,res,next){
     // console.log('conn ready:  '+ mongoose.connection.readyState);
@@ -52,29 +53,39 @@ router.post('/check', function(req, res, next) {
 });
 
 router.get('/setup', function(req, res, next) {
+    console.log(" Public key: ", keyPair.public);
     res.render('registry', {
         data: keyPair.public
     });;
+
 });
 
-
 /// setup new user
-router.post('/setup', check_isExisted, function(req, res, next) {
+//router.post('/setup',decrypt_Request, check_isExisted, function(req, res, next) {
+router.post('/setup', function(req, res, next) {
 
-    var nick = new User({
-        name: req.body.username,
-        //password: req.body.password,
-        password: bcrypt.hashSync(req.body.password, 10),
-        admin: req.body.isAdmin
+    console.log('setup: ', req.body);
+    // console.log('setup: data', req.body.data);
+    // console.log('setup: check', req.body.check);
+    // console.log('setup avatar: ', req.body.avatar);
+    res.json({
+        success:true
     });
 
-    nick.save(function(err) {
-        if (err) throw err;
-        console.log('User saved successfully');
-        res.json({
-            success: true
-        });
-    });
+    // var nick = new User({
+    //     name: req.body.username,
+    //     //password: req.body.password,
+    //     password: bcrypt.hashSync(req.body.password, 10),
+    //     admin: req.body.isAdmin
+    // });
+
+    // nick.save(function(err) {
+    //     if (err) throw err;
+    //     console.log('User saved successfully');
+    //     res.json({
+    //         success: true
+    //     });
+    // });
 });
 
 // Show all users
@@ -212,7 +223,7 @@ function decrypt_Request(req, res, next) {
     //console.log('password: ', password);
 
     req.body.username = userName ;
-    req.body.password = password ;
+    req.body.password = password ;    
     next();
 }
 
