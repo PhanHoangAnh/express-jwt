@@ -11,25 +11,25 @@ var User = require('../models/user');
 //console.log('GenRSAKeyPair....')
 var fs = require('fs');
 var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
+var fs = require('fs');
+//console.log(keyPair);
 
-console.log(keyPair);
-
-var superSecret = "ilovescotchyscotch".toString();
+var superSecret = config.secret;
 
 
 mongoose.connect(config.database, function(error) {
     console.log(" mongodb is connecting...");
-    if (error){
-         throw error; // Handle failed connection
+    if (error) {
+        throw error; // Handle failed connection
     }
-    console.log('conn ready:  '+ mongoose.connection.readyState);
-      
+    console.log('conn ready:  ' + mongoose.connection.readyState);
+
 })
 
-router.use(function(req,res,next){
+router.use(function(req, res, next) {
     // console.log('conn ready:  '+ mongoose.connection.readyState);
     // next();
-    if(mongoose.connection.readyState == 0){
+    if (mongoose.connection.readyState == 0) {
         var err = new Error('Database Error');
         err.status = 503;
         next(err);
@@ -59,11 +59,9 @@ router.get('/setup', function(req, res, next) {
 
 /// setup new user
 //router.post('/setup',decrypt_Request, check_isExisted, function(req, res, next) {
-router.post('/setup', decrypt_Request, check_isExisted, function(req, res, next) {
+router.post('/setup', decrypt_Request, check_isExisted, writeImageToFile, function(req, res, next) {
 
-    //console.log('setup: ', req.body);    
-    //console.log('setup avatar: ', req.body.avatar);
-    
+    //console.log('setup: ', req.body);        
     var nick = new User({
         name: req.body.username,
         //password: req.body.password,
@@ -80,10 +78,7 @@ router.post('/setup', decrypt_Request, check_isExisted, function(req, res, next)
             success: true
         });
     });
-    console.log('setup: data', req.body.username);
-    res.json({
-        success:true
-    });
+
 });
 
 // Show all users
@@ -95,31 +90,21 @@ router.get('/users', function(req, res) {
 });
 
 // route to authenticate a user (POST http://localhost:8080/api/authenticate)
-router.post('/authenticate', decrypt_Request ,function(req, res) {
-//router.post('/authenticate', function(req, res) {
-
-// console.log(req.body.username);
-// console.log(req.body.password);
-    
+router.post('/login', decrypt_Request, function(req, res) {
     // find the user
     User.findOne({
         name: req.body.username
     }, function(err, user) {
-
-        if (err){
-
-          console.log("Error:-----------: ", err);
-          throw err;
-            
-        } 
-
+        if (err) {
+            console.log("Error:-----------: ", err);
+            throw err;
+        }
         if (!user) {
             res.json({
                 success: false,
                 message: 'Authentication failed. User not found.'
             });
         } else if (user) {
-
             // check if password matches
             //if (user.password != req.body.password) {
             if (!bcrypt.compareSync(req.body.password, user.password)) {
@@ -128,13 +113,11 @@ router.post('/authenticate', decrypt_Request ,function(req, res) {
                     message: 'Authentication failed. Wrong password.'
                 });
             } else {
-
                 // if user is found and password is right
                 // create a token
                 var token = jwt.sign(user, superSecret, {
                     expiresInMinutes: 1440 // expires in 24 hours
                 });
-
                 // return the information including token as JSON
                 res.json({
                     success: true,
@@ -204,7 +187,6 @@ function check_isExisted(req, res, next) {
     }); //
 };
 
-
 function decrypt_Request(req, res, next) {
     var RSAKey = cryptico.RSAKey.parse(JSON.stringify(keyPair.private));
     var encrypt_Request = req.body.data;
@@ -221,8 +203,23 @@ function decrypt_Request(req, res, next) {
     var password = cryptico.decryptAESCBC(aes_password, aes_key);
     //console.log('password: ', password);
 
-    req.body.username = userName ;
-    req.body.password = password ;    
+    req.body.username = userName;
+    req.body.password = password;
+    next();
+};
+
+function writeImageToFile(req, res, next) {
+    var fileName = '../public/images/avatars/' + req.body.username + '.png';
+    var b64_data = req.body.avatar.replace(/^data:image\/png;base64,/, "");    
+    console.log("file size: ",b64_data.length);
+    fs.writeFile(fileName, b64_data, 'base64', function(err) {
+        if(err){
+            console.log(err);    
+        }else{
+            console.log("writeFile success:");
+        }        
+        //res.json({err: err});
+    });
     next();
 }
 
