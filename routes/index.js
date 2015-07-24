@@ -66,6 +66,7 @@ router.post('/setup', decrypt_Request, check_isExisted, writeImageToFile, functi
         name: req.body.username,
         //password: req.body.password,
         password: bcrypt.hashSync(req.body.password, 10),
+        avatar: req.body.avatar,
         admin: req.body.isAdmin
     });
 
@@ -220,8 +221,8 @@ function writeImageToFile(req, res, next) {
         }        
         //res.json({err: err});
     });
+    req.body.avatar = fileName;
     next();
 }
-
 
 module.exports = router;
