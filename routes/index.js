@@ -8,15 +8,13 @@ var jwt = require('jsonwebtoken');
 var cryptico = require('cryptico');
 var User = require('../models/user');
 
-
-
 //console.log('GenRSAKeyPair....')
-
-
 var fs = require('fs');
 var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
 
 console.log(keyPair);
+
+var superSecret = "ilovescotchyscotch".toString();
 
 
 mongoose.connect(config.database, function(error) {
@@ -27,7 +25,6 @@ mongoose.connect(config.database, function(error) {
     console.log('conn ready:  '+ mongoose.connection.readyState);
       
 })
-
 
 router.use(function(req,res,next){
     // console.log('conn ready:  '+ mongoose.connection.readyState);
@@ -53,7 +50,7 @@ router.post('/check', function(req, res, next) {
 });
 
 router.get('/setup', function(req, res, next) {
-    console.log(" Public key: ", keyPair.public);
+    //console.log(" Public key: ", keyPair.public);
     res.render('registry', {
         data: keyPair.public
     });;
@@ -62,30 +59,31 @@ router.get('/setup', function(req, res, next) {
 
 /// setup new user
 //router.post('/setup',decrypt_Request, check_isExisted, function(req, res, next) {
-router.post('/setup', function(req, res, next) {
+router.post('/setup', decrypt_Request, check_isExisted, function(req, res, next) {
 
-    console.log('setup: ', req.body);
-    // console.log('setup: data', req.body.data);
-    // console.log('setup: check', req.body.check);
-    // console.log('setup avatar: ', req.body.avatar);
+    //console.log('setup: ', req.body);    
+    //console.log('setup avatar: ', req.body.avatar);
+    
+    var nick = new User({
+        name: req.body.username,
+        //password: req.body.password,
+        password: bcrypt.hashSync(req.body.password, 10),
+        admin: req.body.isAdmin
+    });
+
+    nick.save(function(err) {
+        if (err) {
+            throw err;
+        }
+        console.log('User saved successfully');
+        res.json({
+            success: true
+        });
+    });
+    console.log('setup: data', req.body.username);
     res.json({
         success:true
     });
-
-    // var nick = new User({
-    //     name: req.body.username,
-    //     //password: req.body.password,
-    //     password: bcrypt.hashSync(req.body.password, 10),
-    //     admin: req.body.isAdmin
-    // });
-
-    // nick.save(function(err) {
-    //     if (err) throw err;
-    //     console.log('User saved successfully');
-    //     res.json({
-    //         success: true
-    //     });
-    // });
 });
 
 // Show all users
@@ -97,10 +95,11 @@ router.get('/users', function(req, res) {
 });
 
 // route to authenticate a user (POST http://localhost:8080/api/authenticate)
-router.post('/authenticate', decrypt_Request, function(req, res) {
+router.post('/authenticate', decrypt_Request ,function(req, res) {
+//router.post('/authenticate', function(req, res) {
 
-console.log(req.body.username);
-console.log(req.body.password);
+// console.log(req.body.username);
+// console.log(req.body.password);
     
     // find the user
     User.findOne({
@@ -132,7 +131,7 @@ console.log(req.body.password);
 
                 // if user is found and password is right
                 // create a token
-                var token = jwt.sign(user, router.superSecret, {
+                var token = jwt.sign(user, superSecret, {
                     expiresInMinutes: 1440 // expires in 24 hours
                 });
 
@@ -195,7 +194,7 @@ function check_isExisted(req, res, next) {
             console.log('user is existed');
             res.json({
                 success: false,
-                message: 'Nick has been created'
+                message: 'Nick is existed already'
             });
             //return next(new Error('User is existed'));
         } else {
