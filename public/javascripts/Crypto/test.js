@@ -1,5 +1,9 @@
 
-var cryptoUtil = require('./postJson_withEncrypt.js');
+//browserify postJson_withEncrypt.js --s cryptoUtil > cryptoUtils.js
+
+
+// var cryptoUtil = require('./postJson_withEncrypt.js');
+var cryptoUtil = require('./cryptoUtils.min.js');
 var cryptico = require('cryptico');
 
 var fs = require('fs');
@@ -10,7 +14,7 @@ var publicKey = savedKeyPair.public;
 
 var mock_obj = {};
 mock_obj.userName = "concho con meo va co gi nua day";
-mock_obj.password = "123456"
+mock_obj.password = "123456";
 
 var result = cryptoUtil.EncryptJSON(mock_obj, publicKey);
 
@@ -33,6 +37,25 @@ var aes_key = DecryptRSA.key;
 var aes_userName = DecryptRSA.userName;
 
 var aes_password = DecryptRSA.password;
+
+var userName = cryptico.decryptAESCBC(aes_userName, aes_key); console.log ('userName: ', userName);
+
+var password = cryptico.decryptAESCBC(aes_password, aes_key); console.log ('password: ', password);
+
+mock_obj.userName = "concho con meo va co gi nua day";
+mock_obj.password = "123456";
+var aes_key = cryptoUtil.generateAESKey();
+var result = cryptoUtil.EncryptJSON(mock_obj, publicKey,aes_key );
+var DecryptionResult = cryptico.decrypt(result, RSAKey);
+
+console.log ('EecryptionResult: ', result);
+console.log ('DecryptionResult: ', DecryptionResult.plaintext);
+
+var aes_userName = DecryptRSA.userName;
+
+var aes_password = DecryptRSA.password;
+
+var aes_key = DecryptRSA.key;
 
 var userName = cryptico.decryptAESCBC(aes_userName, aes_key); console.log ('userName: ', userName);
 
