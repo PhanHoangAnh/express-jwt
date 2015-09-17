@@ -4,7 +4,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-
+var url = require('url');
 var cryptico = require('cryptico');
 var User = require('../models/user');
 
@@ -14,8 +14,11 @@ var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
 var fs = require('fs');
 //console.log(keyPair);
 
-var superSecret = config.secret;
+router.superSecret = config.secret;
 
+// router.superSecret = 'ilovescotchyscotch';
+
+console.log("config: ", config);
 
 mongoose.connect(config.database, function(error) {
     console.log(" mongodb is connecting...");
@@ -40,8 +43,9 @@ router.use(function(req, res, next) {
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+    console.log(' pathname: ',url.parse(req.url).pathname)
     res.render('index', {
-        title: 'Express'
+        title: url.parse(req.url).pathname
     });
 });
 
@@ -116,7 +120,7 @@ router.post('/login', decrypt_Request, function(req, res) {
             } else {
                 // if user is found and password is right
                 // create a token
-                var token = jwt.sign(user, superSecret, {
+                var token = jwt.sign(user, router.superSecret, {
                     expiresInMinutes: 1440 // expires in 24 hours
                 });
                 // return the information including token as JSON
@@ -143,6 +147,8 @@ function Auth(req, res, next) {
     // check header or url parameters or post parameters for token
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
 
+    // console.log('token: ', token);
+    // console.log("router.superSecret", router.superSecret);
     // decode token
     if (token) {
         // verifies secret and checks exp
