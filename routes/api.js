@@ -83,20 +83,26 @@ function decryptRequest(req, res, next) {
         next();
         return;
     }
-    var DecryptionResult = cryptico.decrypt(encrypt_Request, RSAKey);
-    var DecryptRSA = JSON.parse(DecryptionResult.plaintext);
+    try {
+        var DecryptionResult = cryptico.decrypt(encrypt_Request, RSAKey);
+        var DecryptRSA = JSON.parse(DecryptionResult.plaintext);
 
-    var aes_key = DecryptRSA.key;
-    var aes_userName = DecryptRSA.userName;
-    var aes_password = DecryptRSA.password;
+        var aes_key = DecryptRSA.key;
+        var aes_userName = DecryptRSA.userName;
+        var aes_password = DecryptRSA.password;
+        var userName = cryptico.decryptAESCBC(aes_userName, aes_key);
+        var password = cryptico.decryptAESCBC(aes_password, aes_key);
+        req.body.uid = userName;
+        req.body.token = password;
+        req.body.key = aes_key;
+        next();
+    } catch (err) {
+        // var err = new Error('Bad request');
+        // err.status = 400;
+        req.invalidRequest = true;
+        next();
+    }
 
-    var userName = cryptico.decryptAESCBC(aes_userName, aes_key);
-    var password = cryptico.decryptAESCBC(aes_password, aes_key);
-
-    req.body.uid = userName;
-    req.body.token = password;
-    req.body.key = aes_key;
-    next();
 }
 //  request bear fb_uid and app_token;
 function checkToken(req, res, next) {
