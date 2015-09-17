@@ -24,12 +24,28 @@ router.get('/', function(req, res, next) {
 
 //  request bear fb_uid and app_token;
 router.post("/checktoken", decryptRequest, checkToken, function(req, res, next) {
+
+    var send_obj = {};
     if (req.invalidRequest == true) {
-        // res.sendStatus(400);
-        res.send('respond from api/checktoken with a invalidRequest');
+        send_obj.err = 1;
+        send_obj.message = 'checktoken: invalidRequest';
+        res.send(JSON.stringify(send_obj));
         return;
     }
-    res.send('respond from api/checktoken with a resource: isAppToken: ' + req.isAppToken);
+    if (req.isAppToken == false) {
+        send_obj.err = 2;
+        send_obj.message = 'checktoken: invalidToken';
+        res.send(JSON.stringify(send_obj));
+        return;
+    } else {
+        send_obj.err = 0;
+        send_obj.message = 'checktoken: validToken';
+        res.send(JSON.stringify(send_obj));
+        return;
+    }
+    send_obj.err = 4;
+    send_obj.message = 'checktoken: unknown err';
+    res.send(JSON.stringify(send_obj));
 });
 
 //  request bear fb_uid and fb_shortToken
@@ -98,14 +114,15 @@ function checkToken(req, res, next) {
         var checkObject = map.get(fb_uid);
         if (checkObject.app_token == app_token) {
             // check validity of app_token
-            jwt.verify(app_token, router.superSecret, decodeJwt );
+            jwt.verify(app_token, router.superSecret, decodeJwt);
         }
     }
+
     function decodeJwt(err, decoded) {
         if (!err) {
             // if everything is good, save to request for use in other routes
             // req.decoded = decoded;
-            req.isAppToken = true;            
+            req.isAppToken = true;
             next();
             return;
         }
