@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Shoptify voiceweb</title>
+    <meta name="generator" content="Bootply" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/navbar.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/shop.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/main.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/startrating.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/Carousel.css">
+    <link rel="stylesheet" type="text/css" href="../public/css/component.css">
+    <link rel="stylesheet" href="../public/css/animate.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+</head>
+<style type="text/css">
+#masthead {
+    background-size: 115% 115%;
+}
+
+#masthead.start {
+    transition: all 5s ease-in-out;
+    background-size: 100% 100%;
+    top: 0;
+    left: 0;
+    padding-top: 15%;
+}
+
+@media only screen and (max-width: 992px) {
+    #masthead {
+        background-size: auto 105%;
+    }
+    #masthead.start {
+        transition: all 5s ease-in-out;
+        background-size: auto 100%;
+        top: 0;
+        left: 0;
+        padding-top: 15%;
+        /*bottom: 0px;*/
+    }
+}
+
+.controls {
+    margin-top: 15px;
+    /*vertical-align: middle;*/
+}
+
+@media (min-width: 979px) {
+    #sidebar.affix-bottom {
+        position: absolute;
+    }
+    #sidebar.affix-top {
+        position: static;
+        /*margin-top: 30px;*/
+        /*width: 300px;*/
+    }
+    #sidebar.affix {
+        position: fixed;
+        top: 70px;
+        /*width: 300px;*/
+    }
+}
+
+#phasebeam {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+#phasebeam canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.introduction .label {
+    background-color: #5CB85C;
+}
+
+.animatedIcon {
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-animation: iconAni 2s infinite;
+    /* Safari 4+ */
+    -moz-animation: iconAni 2s infinite;
+    /* Fx 5+ */
+    -o-animation: iconAni 2s infinite;
+    /* Opera 12+ */
+    animation: iconAni 2s infinite;
+    /* IE 10+, Fx 29*/
+}
+
+@-webkit-keyframes iconAni {
+    0% {
+        background-color: #FFF;
+        margin-top: 0px;
+    }
+    50% {
+        background-color: #5CB85C;
+        margin-top: 25px;
+    }
+    100% {
+        background-color: #F0a;
+        margin-top: 10px;
+    }
+}
+
+@-moz-keyframes iconAni {
+    0% {
+        background-color: #FFF;
+        margin-top: 0px;
+    }
+    50% {
+        background-color: #5CB85C;
+        margin-top: 25px;
+    }
+    100% {
+        background-color: #F0a;
+        margin-top: 10px;
+    }
+}
+
+@-o-keyframes iconAni {
+    0% {
+        background-color: #FFF;
+        margin-top: 0px;
+    }
+    50% {
+        background-color: #5CB85C;
+        margin-top: 25px;
+    }
+    100% {
+        background-color: #F0a;
+        margin-top: 10px;
+    }
+}
+
+@keyframes iconAni {
+    0% {
+        background-color: #FFF;
+        margin-top: 0px;
+    }
+    50% {
+        background-color: #5CB85C;
+        margin-top: 25px;
+    }
+    100% {
+        background-color: #F0a;
+        margin-top: 10px;
+    }
+}
+
+.hideElement {
+    display: none;
+}
+
+#visitorHolder a {
+    color: #fff;
+}
+
+#visitorHolder:active a {
+    background-color: #fff;
+    color: #3b5998;
+}
+</style>
+<!-- HTML code from Bootply.com editor -->
+
+<body style="background-color: rgb(0,0,0)">
+    <!-- Dont touch this section -->
+    <!-- masthead -->
+    <div id="masthead">
+        <!-- <div style="height:100%; width: 100%; background-color: rgba(0,0,0,.6)"></div> -->
+        <div class="container-fluid">
+            <div class="row cover">
+                <div class="col-md-6 col-md-offset-1 ">
+                    <h1><%=title%>
+                        <!-- <hr style = "border-top: 1px solid rgba(255,255,255,.3)"> -->
+                        <p class="lead"><app-slogan>Shop chuyên hàng hiệu...!</app-slogan></p>
+                    </h1>
+                </div>
+                <!-- <div class="col-md-5" style="padding-right:30px; bottom: 10px; right: 0px; position: absolute;"> -->
+                <div class="col-md-5" style="padding:30px">
+                    <!-- Primary Advertising Here -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <marketing-message>Tin tức khuyến mại</marketing-message>
+                        </div>
+                        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean sit amet felis dolor, in sagittis nisi. Sed ac orci quis tortor imperdiet venenatis. Duis elementum auctor accumsan. Aliquam in felis sit amet augue.</div>
+                    </div>
+                    <!-- /Primary Advertising Here -->
+                </div>
+            </div>
+        </div>
+        <!-- /cont -->
+    </div>
+    <!-- /masthead -->
+    <!-- NavBar -->
+    <div id="nav-wrapper">
+        <div id="nav" class="navbar navbar-inverse navbar-static-top navbar" role="navigation">
+            <div class="container">
+                <div class="row">
+                    <div>
+                        <img src="../public/img/CatLogo.png" class="logo">
+                    </div>
+                    <div class='site-name hidden-xs'>
+                        AbcJSC
+                    </div>
+                    <div class='navbar-left site-name phone'>
+                        <i class="fa fa-phone "></i>
+                        <!-- <i class="fa fa-facebook"></i> -->
+                    </div>
+                    <div class="navbar-header">
+                        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                    <nav class="collapse navbar-collapse " role="navigation">
+                        <ul class="nav navbar-nav ">
+                            <li class='navbar-right'>
+                                <a href="#sec">About</a>
+                            </li>
+                            <li class='navbar-right'>
+                                <a href="#sec">Khuyến mãi</a>
+                            </li>
+                            <li class='navbar-right'>
+                                <a href="#sec">Sản phẩm</a>
+                            </li>
+                            <li class='navbar-right '>
+                                <a href="#sec">Home</a>
+                            </li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right" id = "visitor">
+                            <li class='navbar-right' id='visitorHolder'>
+                                <a href="#sec" id = "login"> <i class="fa fa-facebook fa-2x "></i><span> Login with Facebook</span></a>
+                            </li>                            
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- /NavBar -->
+    <!-- /Dont touch this section -->
+    <!-- <div style="width:100%; height:20px; background-color: rgba(0,0,0,.5)"></div> -->
+    <div class="container-fluid" id="start-offset">
+        <hr>
+        <!-- <div app-moveup: 0 style="position: relative; top: -128px;"> -->
+        <div app-moveup: 0 style="position: relative;">
+            <!--left-->
+            <!--right-->
+            <div class="col-sm-3 col-md-push-9 hidden-xs">
+                <!-- <div class="col-sm-3 col-md-pull-9"> -->
+                <div id='sidebar' class='sidebar'>
+                    <!-- <h2>Side</h2> -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <marketing-message>Tin tức khuyến mại</marketing-message>
+                        </div>
+                        <div class="panel-body">Sed ac orci quis tortor imperdiet venenatis. Duis elementum auctor accumsan. Aliquam in felis sit amet augue.</div>
+                    </div>
+                    <hr>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <marketing-message>Tin tức khuyến mại</marketing-message>
+                        </div>
+                        <div class="panel-body">Content here..</div>
+                    </div>
+                    <hr>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <marketing-message>Tin tức khuyến mại</marketing-message>
+                        </div>
+                        <div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean sit amet felis dolor, in sagittis nisi. Sed ac orci quis tortor imperdiet venenatis. Duis elementum auctor accumsan. Aliquam in felis sit amet augue.</div>
+                    </div>
+                    <hr>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <marketing-message>Tin tức khuyến mại</marketing-message>
+                        </div>
+                        <div class="panel-body">Content here..</div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+            <!--/right-->
+            <!--/left-->
+            <!--center-->
+            <div class="col-sm-9 col-md-pull-3">
+                <div class="row">
+                    <carousel-area>
+                        <!-- <div style='background-color: rgba(0,0,0,.6); color:white; width:100% ; margin-top: 72px'> -->
+                        <div style='background-color: rgba(0,0,0,.6); color:white; width:100%'>
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <h3>
+                                        Sản phẩm mới...!</h3>
+                                </div>
+                                <div class="col-md-3">
+                                    <!-- Controls -->
+                                    <div class="controls pull-right ">
+                                        <a class="left fa fa-chevron-left btn btn-success" href="#carousel-example" data-slide="prev"></a>
+                                        <a class="right fa fa-chevron-right btn btn-success" href="#carousel-example" data-slide="next"></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="carousel-example" class="carousel slide carousel-fade" data-ride="carousel">
+                                <!-- Wrapper for slides -->
+                                <div class="carousel-inner">
+                                    <div class="item active">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <div class="col-item">
+                                                    <item-detail>
+                                                        <div class="photo">
+                                                            <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                            <div class='focus'></div>
+                                                        </div>
+                                                        <div class="rating">
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                        </div>
+                                                        <div></div>
+                                                        <!-- style="display: inline-block;height: 4em;clear:both; /* white-space: nowrap; */ overflow: hidden; text-overflow: ellipsis" -->
+                                                        <!-- <div product-title style='clear:both; white-space: nowrap; overflow: hidden; text-overflow: ellipsis'> -->
+                                                        <div product-title class='description'>
+                                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                        </div>
+                                                        <div product-price>Price: 123$</div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                            <div add-toCart class="items">
+                                                                <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                <br>Add to Cart
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                            <div more-detail style="padding-left:0 " class="items">
+                                                                <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                    <i class="fa fa-list"></i>
+                                                                    <br>More details
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </item-detail>
+                                                    <hr>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="col-item">
+                                                    <item-detail>
+                                                        <div class="photo">
+                                                            <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                            <div class='focus'></div>
+                                                        </div>
+                                                        <div class="rating">
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                        </div>
+                                                        <div></div>
+                                                        <!-- style="display: inline-block;height: 4em;clear:both; /* white-space: nowrap; */ overflow: hidden; text-overflow: ellipsis" -->
+                                                        <!-- <div product-title style='clear:both; white-space: nowrap; overflow: hidden; text-overflow: ellipsis'> -->
+                                                        <div product-title class='description'>
+                                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                        </div>
+                                                        <div product-price>Price: 123$</div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                            <div add-toCart class="items">
+                                                                <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                <br>Add to Cart
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                            <div more-detail style="padding-left:0 " class="items">
+                                                                <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                    <i class="fa fa-list"></i>
+                                                                    <br>More details
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </item-detail>
+                                                    <hr>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="col-item">
+                                                    <item-detail>
+                                                        <div class="photo">
+                                                            <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                            <div class='focus'></div>
+                                                        </div>
+                                                        <div class="rating">
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                        </div>
+                                                        <div></div>
+                                                        <!-- style="display: inline-block;height: 4em;clear:both; /* white-space: nowrap; */ overflow: hidden; text-overflow: ellipsis" -->
+                                                        <!-- <div product-title style='clear:both; white-space: nowrap; overflow: hidden; text-overflow: ellipsis'> -->
+                                                        <div product-title class='description'>
+                                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                        </div>
+                                                        <div product-price>Price: 123$</div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                            <div add-toCart class="items">
+                                                                <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                <br>Add to Cart
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                            <div more-detail style="padding-left:0 " class="items">
+                                                                <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                    <i class="fa fa-list"></i>
+                                                                    <br>More details
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </item-detail>
+                                                    <hr>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <div class="col-item">
+                                                    <item-detail>
+                                                        <div class="photo">
+                                                            <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                            <div class='focus'></div>
+                                                        </div>
+                                                        <div class="rating">
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                        </div>
+                                                        <div></div>
+                                                        <!-- style="display: inline-block;height: 4em;clear:both; /* white-space: nowrap; */ overflow: hidden; text-overflow: ellipsis" -->
+                                                        <!-- <div product-title style='clear:both; white-space: nowrap; overflow: hidden; text-overflow: ellipsis'> -->
+                                                        <div product-title class='description'>
+                                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                        </div>
+                                                        <div product-price>Price: 123$</div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                            <div add-toCart class="items">
+                                                                <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                <br>Add to Cart
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                            <div more-detail style="padding-left:0 " class="items">
+                                                                <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                    <i class="fa fa-list"></i>
+                                                                    <br>More details
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </item-detail>
+                                                    <hr>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="col-item">
+                                                    <item-detail>
+                                                        <div class="photo">
+                                                            <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                            <div class='focus'></div>
+                                                        </div>
+                                                        <div class="rating">
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                        </div>
+                                                        <div></div>
+                                                        <!-- style="display: inline-block;height: 4em;clear:both; /* white-space: nowrap; */ overflow: hidden; text-overflow: ellipsis" -->
+                                                        <!-- <div product-title style='clear:both; white-space: nowrap; overflow: hidden; text-overflow: ellipsis'> -->
+                                                        <div product-title class='description'>
+                                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                        </div>
+                                                        <div product-price>Price: 123$</div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                            <div add-toCart class="items">
+                                                                <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                <br>Add to Cart
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                            <div more-detail style="padding-left:0 " class="items">
+                                                                <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                    <i class="fa fa-list"></i>
+                                                                    <br>More details
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </item-detail>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="col-item">
+                                                    <item-detail>
+                                                        <div class="photo">
+                                                            <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                            <div class='focus'></div>
+                                                        </div>
+                                                        <div class="rating">
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                            <span>☆</span>
+                                                        </div>
+                                                        <div></div>
+                                                        <!-- style="display: inline-block;height: 4em;clear:both; /* white-space: nowrap; */ overflow: hidden; text-overflow: ellipsis" -->
+                                                        <!-- <div product-title style='clear:both; white-space: nowrap; overflow: hidden; text-overflow: ellipsis'> -->
+                                                        <div product-title class='description'>
+                                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                        </div>
+                                                        <div product-price>Price: 123$</div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                            <div add-toCart class="items">
+                                                                <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                <br>Add to Cart
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                            <div more-detail style="padding-left:0 " class="items">
+                                                                <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                    <i class="fa fa-list"></i>
+                                                                    <br>More details
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </item-detail>
+                                                    <hr>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </carousel-area>
+                </div>
+                <hr/>
+                <!--  End of Top Carousel -->
+                <div class="row">
+                    <div style='background-color: rgba(0,0,0,.6); color:white; width:100% ; margin-top: 72px; padding-left: 10px' class="slide-up">
+                        <carousel-area>
+                            <div class="row">
+                                <div class="row">
+                                    <div class="col-md-9">
+                                        <h3>
+                                            Sản phẩm bán nhiều nhất...!</h3>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <!-- Controls -->
+                                        <div class="controls pull-right">
+                                            <a class="left fa fa-chevron-left btn btn-success" href="#carousel-collections" data-slide="prev"></a>
+                                            <a class="right fa fa-chevron-right btn btn-success" href="#carousel-collections" data-slide="next"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="carousel-collections" class="carousel slide carousel-fade" data-ride="carousel">
+                                    <!-- Wrapper for slides -->
+                                    <div class="carousel-inner">
+                                        <div class="item active">
+                                            <div class="row">
+                                                <main-panel>
+                                                    <div class="col-sm-3">
+                                                        <div class="col-item">
+                                                            <item-detail>
+                                                                <div class="photo">
+                                                                    <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                                    <div class='focus'></div>
+                                                                </div>
+                                                                <div class="rating">
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                </div>
+                                                                <div></div>
+                                                                <div product-title class='description'>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                                </div>
+                                                                <div product-price>Price: 123$</div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                                    <div add-toCart class="items">
+                                                                        <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                        <br>Add to Cart
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                                    <div more-detail style="padding-left:0 " class="items">
+                                                                        <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                            <i class="fa fa-list"></i>
+                                                                            <br>More details
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </item-detail>
+                                                            <hr>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="col-item">
+                                                            <item-detail>
+                                                                <div class="photo">
+                                                                    <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                                    <div class='focus'></div>
+                                                                </div>
+                                                                <div class="rating">
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                </div>
+                                                                <div></div>
+                                                                <div product-title class='description'>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                                </div>
+                                                                <div product-price>Price: 123$</div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                                    <div add-toCart class="items">
+                                                                        <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                        <br>Add to Cart
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                                    <div more-detail style="padding-left:0 " class="items">
+                                                                        <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                            <i class="fa fa-list"></i>
+                                                                            <br>More details
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </item-detail>
+                                                            <hr>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="col-item">
+                                                            <item-detail>
+                                                                <div class="photo">
+                                                                    <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                                    <div class='focus'></div>
+                                                                </div>
+                                                                <div class="rating">
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                </div>
+                                                                <div></div>
+                                                                <div product-title class='description'>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                                </div>
+                                                                <div product-price>Price: 123$</div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                                    <div add-toCart class="items">
+                                                                        <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                        <br>Add to Cart
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                                    <div more-detail style="padding-left:0 " class="items">
+                                                                        <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                            <i class="fa fa-list"></i>
+                                                                            <br>More details
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </item-detail>
+                                                            <hr>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="col-item">
+                                                            <item-detail>
+                                                                <div class="photo">
+                                                                    <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                                    <div class='focus'></div>
+                                                                </div>
+                                                                <div class="rating">
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                </div>
+                                                                <div></div>
+                                                                <div product-title class='description'>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                                </div>
+                                                                <div product-price>Price: 123$</div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                                    <div add-toCart class="items">
+                                                                        <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                        <br>Add to Cart
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                                    <div more-detail style="padding-left:0 " class="items">
+                                                                        <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                            <i class="fa fa-list"></i>
+                                                                            <br>More details
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </item-detail>
+                                                            <hr>
+                                                        </div>
+                                                    </div>
+                                                </main-panel>
+                                            </div>
+                                        </div>
+                                        <div class="item">
+                                            <div class="row">
+                                                <main-panel>
+                                                    <div class="col-sm-3">
+                                                        <div class="col-item">
+                                                            <item-detail>
+                                                                <div class="photo">
+                                                                    <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                                    <div class='focus'></div>
+                                                                </div>
+                                                                <div class="rating">
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                </div>
+                                                                <div></div>
+                                                                <div product-title class='description'>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                                </div>
+                                                                <div product-price>Price: 123$</div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                                    <div add-toCart class="items">
+                                                                        <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                        <br>Add to Cart
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                                    <div more-detail style="padding-left:0 " class="items">
+                                                                        <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                            <i class="fa fa-list"></i>
+                                                                            <br>More details
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </item-detail>
+                                                            <hr>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="col-item">
+                                                            <item-detail>
+                                                                <div class="photo">
+                                                                    <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                                    <div class='focus'></div>
+                                                                </div>
+                                                                <div class="rating">
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                </div>
+                                                                <div></div>
+                                                                <div product-title class='description'>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                                </div>
+                                                                <div product-price>Price: 123$</div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                                    <div add-toCart class="items">
+                                                                        <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                        <br>Add to Cart
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                                    <div more-detail style="padding-left:0 " class="items">
+                                                                        <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                            <i class="fa fa-list"></i>
+                                                                            <br>More details
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </item-detail>
+                                                            <hr>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="col-item">
+                                                            <item-detail>
+                                                                <div class="photo">
+                                                                    <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                                    <div class='focus'></div>
+                                                                </div>
+                                                                <div class="rating">
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                </div>
+                                                                <div></div>
+                                                                <div product-title class='description'>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                                </div>
+                                                                <div product-price>Price: 123$</div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                                    <div add-toCart class="items">
+                                                                        <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                        <br>Add to Cart
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                                    <div more-detail style="padding-left:0 " class="items">
+                                                                        <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                            <i class="fa fa-list"></i>
+                                                                            <br>More details
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </item-detail>
+                                                            <hr>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="col-item">
+                                                            <item-detail>
+                                                                <div class="photo">
+                                                                    <img src="../public/img/Products/product3.jpg" class="img-responsive center-block">
+                                                                    <div class='focus'></div>
+                                                                </div>
+                                                                <div class="rating">
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                    <span>☆</span>
+                                                                </div>
+                                                                <div></div>
+                                                                <div product-title class='description'>
+                                                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pharetra varius quam sit amet vulputate. Quisque mauris augue, molestie tincidunt condimentum vitae, gravida a libero. Aenean
+                                                                </div>
+                                                                <div product-price>Price: 123$</div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0 ">
+                                                                    <div add-toCart class="items">
+                                                                        <i class="fa fa-cart-plus" style='font-side:24px'></i>
+                                                                        <br>Add to Cart
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-xs-6 col-sm-6 col-md-6 col-lg-6" style="padding:0">
+                                                                    <div more-detail style="padding-left:0 " class="items">
+                                                                        <div style="border-left: dotted 1px; padding-left: 5px">
+                                                                            <i class="fa fa-list"></i>
+                                                                            <br>More details
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </item-detail>
+                                                            <hr>
+                                                        </div>
+                                                    </div>
+                                                </main-panel>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </carousel-area>
+                    </div>
+                </div>
+            </div>
+            <!--/center-->
+        </div>
+    </div>
+    <div id="end-offset">
+        <section class="divider">
+            <div class="col-sm-6 col-sm-offset-3 text-center">
+                <!-- <h2 style="padding:20px;background-color:rgba(5,5,5,.8)">Try and Tweak Different Layouts</h2> -->
+                <h2><i class="fa fa-arrow-circle-down animatedIcon"></i></h2>
+            </div>
+        </section>
+        <div class="container-fluid" style="background-color: #fff; display:flex" id="section1">
+            <div class="col-md-6 col-lg-6" style="flex:1">
+                <h3><i class="fa fa-microphone"></i> Giới thiệu</h3>
+                <div style="column-count:2">
+                    Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum
+                </div>
+                <hr>
+                <h3><i class="fa fa-user-plus"></i> Sản phẩm</h3>
+                <div class="introduction">
+                    <span class="label label-default">keyword</span> <span class="label ">keyword</span> <span class="label label-default">keyword</span> <span class="label ">keyword</span> <span class="label label-default">keyword</span> <span class="label ">keyword</span> <span class="label label-default">keyword</span> <span class="label ">keyword</span> <span class="label label-default">keyword</span> <span class="label ">keyword</span>
+                    <span class="label label-default">keyword</span> <span class="label ">keyword</span> <span class="label label-default">keyword</span> <span class="label ">keyword</span> <span class="label label-default">keyword</span> <span class="label ">keyword</span> <span class="label label-default">keyword</span> <span class="label ">keyword</span> <span class="label label-default">keyword</span> <span class="label ">keyword</span>
+                </div>
+                <hr>
+                <h3><i class="fa fa-anchor"></i> Liên hệ:</h3>
+                <li class="list-unstyled">
+                    <i class="fa fa-phone-square"></i>
+                    <label>Phone:</label> 0912345678
+                </li>
+                <li class="list-unstyled">
+                    <i class="fa fa-envelope"></i>
+                    <label>email:</label> abc@gmail.com
+                </li>
+                <li class="list-unstyled">
+                    <i class="fa fa-map-marker"></i>
+                    <label>Địa chỉ:</label> Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet
+                </li>
+                <hr>
+            </div>
+            <div class="col-md-6 col-lg-6" style="padding:0; flex:1" id="googleMap">
+            </div>
+            <hr>
+        </div>
+        <section class="divider">
+            <div class="col-sm-6 col-sm-offset-3 text-center ">
+                <!-- <h2 style="padding:20px;background-color:rgba(5,5,5,.8)">Try and Tweak Different Layouts</h2> -->
+                <h2><i class="fa fa-arrow-circle-down animatedIcon"></i></h2>
+            </div>
+        </section>
+        <footer>
+            <div class="container-fluid" style="background-color:rgba(0,0,0,.65); ">
+                <div class=" footer row cover " style="padding-top: 20px; padding-bottom: 40px;">
+                    <div class="col-md-10 col-md-offset-1">
+                        <div class="col-md-4" style='text-align: center; margin-top: 30px'>
+                            <span style="font-size: 24px; color:white;  ">CON MÈO</span>
+                            <p></p>
+                            <img src="../public/img/CatLogo.png" style="width: 40%; margin-top: 30px">
+                            <p></p>
+                            Shop chuyên hàng hiệu...!
+                        </div>
+                        <div class="col-md-4" style="margin-top: 30px">
+                            <span style="font-size: 24px; color:white; text-align: center "><i class="fa fa-arrows"></i>   THÔNG TIN...</span>
+                            <p></p>
+                            <li>Sản phẩm mới</li>
+                            <li>Sản phẩm bán chạy nhất</li>
+                            <li>Chúng tôi</li>
+                            <li>Tin khuyến mại</li>
+                            <li>Chính sách</li>
+                        </div>
+                        <div class="col-md-4" style="margin-top: 30px">
+                            <span style="font-size: 24px; color:white; text-align: center "><i class="fa fa-user-plus"></i>  SẢN PHẨM...</span>
+                            <P></P>
+                            <li>keyword abc</li>
+                            <li>keyword abc</li>
+                            <li>keyword abc</li>
+                            <li>keyword abc</li>
+                            <li>keyword abc</li>
+                        </div>
+                    </div>
+                </div>
+                <!--/col-->
+            </div>
+            <div style=" width: 100%; background-color: rgba(0,0,0,.85); height: 90px;">
+                @Copyright:abcd@abc.jsc
+            </div>
+        </footer>
+    </div>
+    <script type="text/javascript" src='../public/js/utils.js'></script>
+    <script src="http://maps.googleapis.com/maps/api/js"></script>
+    <script type="text/javascript" src="../public/js/Crypto/cryptoUtils.js"></script>
+    <script type="text/javascript">
+    /* Custom JS */
+    //--// Bootstrap component
+    $(function() {
+        // $('#nav-wrapper').height($("#nav").height());
+        // $('#nav-wrapper').height(200);
+        $('#nav').affix({
+            offset: {
+                top: function() {
+                    // Do other stuff here-- chipl
+                    return $('#start-offset').offset().top / 2;
+                }
+            }
+        });
+        // Sidebar affix
+        $('#sidebar').affix({
+            offset: {
+                top: $('#start-offset').offset().top + 0,
+                bottom: $('#end-offset').outerHeight() - 20
+            }
+        }).on('affix.bs.affix', function() { // before affix
+            $(this).css({
+                /*'top': headerHeight,*/ // for fixed height
+                'width': $(this).outerWidth() // variable widths
+            });
+        }).on('affix-bottom.bs.affix', function() { // before affix-bottom
+            // $(this).css('bottom', 'auto'); // THIS is what makes the jumping
+        });;
+
+    });
+    $('.carousel').carousel({
+        interval: 2000 * 10
+    });
+    // for Banner ini only 
+    $(document).ready(function() {
+        /** code inside **/
+        var masthead = $("#masthead");
+        masthead.addClass('start');
+        var visitorHolder = $('#visitorHolder');
+
+    });
+    //-// Google map    
+    var myCenter = new google.maps.LatLng(21.030668, 105.852284);
+
+
+    function initialize() {
+        var mapProp = {
+            center: myCenter,
+            zoom: 14,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,
+        };
+
+        var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+        var marker = new google.maps.Marker({
+            position: myCenter,
+            animation: google.maps.Animation.DROP
+        });
+
+        marker.setMap(map);
+        google.maps.event.addListener(marker, 'click', function() {
+            infowindow.open(map, marker);
+        });
+    }
+    google.maps.event.addDomListener(window, 'load', initialize);
+    var infowindow = new google.maps.InfoWindow({
+        content: "Hello World!"
+    });
+    </script>
+    <div id="phasebeam">
+        <canvas width="700" height="650"></canvas>
+        <canvas width="700" height="650"></canvas>
+        <canvas width="700" height="650"></canvas>
+    </div>
+    <script type="text/javascript" src="../public/js/phasebeam.js"></script>
+</body>
+<script type="text/javascript">
+// This function is called when someone finishes with the Login
+// Button.  See the onlogin handler attached to it in the sample
+// code below.
+var RSAPublicKey = <%-JSON.stringify(data)%>
+
+function checkLoginStatus() {
+    FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+    });
+}
+
+window.fbAsyncInit = function() {
+    FB.init({
+        appId: '203172309854130',
+        cookie: true, // enable cookies to allow the server to access 
+        // the session
+        xfbml: false, // parse social plugins on this page
+        version: 'v2.4' // use version 2.2
+    });
+
+    FB.getLoginStatus(function(response) {
+        statusChangeCallback(response);
+    });
+
+};
+
+// Load the SDK asynchronously
+(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+
+var aes_key;
+var app_token;
+
+function getNewToken(uid, token) {
+    // console.log("uid: ", uid);
+    //    console.log("accessToken: ", token);
+    var _data = {
+        userName: uid,
+        password: token
+    };
+    aes_key = cryptoUtil.generateAESKey();
+    var json_data = {
+        data: cryptoUtil.EncryptJSON(_data, RSAPublicKey, aes_key)
+    };
+    // console.log("stringify: ", JSON.stringify(_data));
+    console.log("cryptoUtil: ", cryptoUtil);
+
+    // _data = cryptoUtil.EncryptJSON(_data, RSAPublicKey, aes_key);
+    console.log('_data: ', _data);
+    $.ajax({
+        // url: './userToken',
+        url: './api/gettoken',
+
+        method: 'POST',
+        data: json_data,
+        // contentType:'application/json',
+        complete: function(data, status, jqXHR) {
+            console.log('result', data);
+            // console.log(typeof(data));
+            var obj = JSON.parse(data.responseText);
+            if (obj.err == 0) {
+                var encrypted_app_token = obj.encrypted_app_token;
+                console.log('encrypted_app_token: ', encrypted_app_token);
+                var _app_token = cryptoUtil.aesDecryptor(encrypted_app_token, aes_key);
+                console.log("typeof app_token: ", typeof(_app_token));
+                console.log('app_token: ', JSON.parse(_app_token).app_token);
+                app_token = JSON.parse(_app_token).app_token;
+                localStorage.setItem("app_token", app_token);
+            }
+        }
+    });
+}
+
+function checkToken(uid, accessToken) {
+    //1. check wheather token is existed in localStorage
+    if (localStorage.getItem("app_token") === null) {
+        getNewToken(uid, accessToken);
+        return;
+    }
+    //2. get Token from localStorage
+    app_token = localStorage.getItem("app_token");
+    // check Item validation
+    var _data = {
+        userName: uid,
+        password: app_token
+    };
+    // _aes_key = cryptoUtil.generateAESKey();
+    var json_data = {
+        data: cryptoUtil.EncryptJSON(_data, RSAPublicKey)
+    };
+    $.ajax({
+        // url: './userToken',
+        url: './api/checktoken',
+
+        method: 'POST',
+        data: json_data,
+        complete: function(data, status, jqXHR) {
+            var obj = JSON.parse(data.responseText);
+            if (obj.err != 0) {
+                getNewToken(uid, accessToken);
+            }
+        }
+    });
+}
+
+
+function fetchingInfo(callback) {
+
+    // console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', 'GET', {
+        "fields": "id,name,email"
+    }, function(response) {        
+        callback(response);
+    });
+
+}
+
+function handleFBData(response) {
+    // document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.name + '!';
+    var visitorHolder = document.querySelector('#visitorHolder');        
+    // console.log("visitorHolder", visitorHolder);
+    var parent = visitorHolder.parentNode;
+    parent.removeChild(visitorHolder);
+    FB.api('/me/picture?type=small', function(response) {
+        // document.getElementById("profileImage").setAttribute("src", response.data.url);
+        console.log(response.data.url);
+        var _img = document.querySelector("#avatar");        
+        _img.setAttribute("src", response.data.url);
+        _img.style.border = "0";
+            
+    });
+
+    var _li = document.createElement('li');
+    _li.classList.add ("navbar-right");    
+    var _a = document.createElement('a');
+    var _span = document.createElement('span');
+    var _div = document.createElement('div');
+    var _img = document.createElement('img');
+
+    _div.classList.add('navbar-right');
+    _div.style.with = "25px";
+    _div.style.height = "25px";
+    _div.style.width = "20px";
+    _div.style.overflow = "hidden";
+
+    _img.style.width = "25px";
+    _img.style.height = "auto";
+    // _img.style.paddingLeft = "10px";
+    _img.setAttribute("id", "avatar");    
+    _div.appendChild(_img);
+    _span.appendChild(_div);
+
+    _a.appendChild(_span);
+    _a.style.color = "#fff";
+    var t = document.createTextNode( String.fromCharCode(160)+ response.name +  String.fromCharCode(160));
+    _a.appendChild(t);
+    _li.appendChild(_a)
+    parent.appendChild(_li);
+    console.log("parent", parent);
+
+}
+
+// This is called with the results from from FB.getLoginStatus().
+function statusChangeCallback(response) {
+
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected') {
+        fetchingInfo(handleFBData);
+        var uid = response.authResponse.userID;
+        var accessToken = response.authResponse.accessToken;        
+        checkToken(uid, accessToken);
+
+    } else if (response.status === 'not_authorized') {
+        // The person is logged into Facebook, but not your app.
+        // document.getElementById('status').innerHTML += 'Please log ' +
+        // 'into this app.';
+        addLoginListener();
+    } else {
+        // The person is not logged into Facebook, so we're not sure if
+        // they are logged into this app or not.
+        // document.getElementById('status').innerHTML += 'Please log ' +
+        // 'into Facebook.';
+        addLoginListener();
+    }
+    function addLoginListener(){
+        var login = document.querySelector('#visitor');
+        login.addEventListener('click',fb_enter,false);
+    }    
+}
+
+
+
+function fb_enter() {
+    // console.log("okie here");
+    FB.login(function(response) {
+        console.log(response);
+        if (response.status === 'connected') {
+            statusChangeCallback(response);
+        }
+    }, {})
+
+}
+</script>
+
+</html>
