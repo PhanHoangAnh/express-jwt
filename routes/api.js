@@ -122,12 +122,12 @@ function checkToken(req, res, next) {
             // check validity of app_token
             jwt.verify(app_token, router.superSecret, decodeJwt);
         }
+    } else {
+        next();
     }
 
     function decodeJwt(err, decoded) {
         if (!err) {
-            // if everything is good, save to request for use in other routes
-            // req.decoded = decoded;
             req.isAppToken = true;
             next();
             return;
