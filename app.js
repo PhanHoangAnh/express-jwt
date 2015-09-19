@@ -33,13 +33,14 @@ app.use('/public', express.static(path.join(__dirname, 'public')));;
 var fs = require('fs');
 var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
 
-app.use('/api', api);
+app.use('/apix', api);
 app.use('/users', users);
 
-app.use('/:shopName', function(req, res, next) {
-    req.shopName = req.params.shopName;
-    next();
-}, routes);
+app.use('/', routes);
+// app.use('/:shopName', function(req, res, next) {
+//     req.shopName = req.params.shopName;
+//     next();
+// }, routes);
 
 
 
