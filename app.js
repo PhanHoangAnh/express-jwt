@@ -9,6 +9,7 @@ var compress = require('compression');
 var routes = require('./routes/index');
 var api = require('./routes/api');
 var users = require('./routes/users');
+var create_new = require('./routes/create_new');
 
 var app = express();
 
@@ -19,10 +20,8 @@ app.set('view engine', 'ejs');
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: false
-}));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 app.use(cookieParser());
 app.use(compress());
 
@@ -33,14 +32,14 @@ app.use('/public', express.static(path.join(__dirname, 'public')));;
 var fs = require('fs');
 var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
 
-app.use('/apix', api);
+app.use('/api', api);
 app.use('/users', users);
+app.use('/createnewshop',create_new);
 
-app.use('/', routes);
-// app.use('/:shopName', function(req, res, next) {
-//     req.shopName = req.params.shopName;
-//     next();
-// }, routes);
+app.use('/:shopName', function(req, res, next) {
+    req.shopName = req.params.shopName;
+    next();
+}, routes);
 
 
 
