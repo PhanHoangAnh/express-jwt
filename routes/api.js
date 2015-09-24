@@ -73,6 +73,11 @@ router.post("/gettoken", decryptRequest, getToken, extendFbAccessToken, function
     // res.send('respond from api/gettoken with a resource');
 });
 
+router.post("/uploadImage",decryptRequest,checkToken, writeImageToFile, function(req,res,next){
+    writeFileResult = req.writeFileResult;
+    res.send(JSON.stringify(writeFileResult));
+});
+
 
 function decryptRequest(req, res, next) {
     var RSAKey = cryptico.RSAKey.parse(JSON.stringify(keyPair.private));
@@ -127,11 +132,12 @@ function checkToken(req, res, next) {
     }
 
     function decodeJwt(err, decoded) {
+        // console.log("decoded: ", decoded);
         if (!err) {
             req.isAppToken = true;
             next();
             return;
-        }
+        }        
         next();
     }
 }
@@ -203,5 +209,27 @@ function extendFbAccessToken(req, res, next) {
         next();
     });
 }
+
+function writeImageToFile(req, res, next) {
+    var type = req.body.u_type
+    var _avatar_fileName = './public/shops/'+type+'/' + req.body.uid + '.png';    
+    var b64_data = req.body.img.replace(/^data:image\/png;base64,/, "");    
+    //console.log("file size: ",b64_data.length);
+
+    writeFileResult = {};
+    writeFileResult.file_length = b64_data.length;
+    writeFileResult.err = 0;
+    writeFileResult.err.desc = "";
+    fs.writeFile(_avatar_fileName, b64_data, 'base64', function(err) {        
+        if(err){
+            //res.sendStatus(500);
+            writeFileResult.err = 1;
+            writeFileResult.err.desc = err;
+            }
+    req.writeFileResult = writeFileResult;
+    next();    
+    });
+}
+
 
 module.exports = router;
