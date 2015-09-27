@@ -78,6 +78,21 @@ router.post("/uploadImage",decryptRequest,checkToken, writeImageToFile, function
     res.send(JSON.stringify(writeFileResult));
 });
 
+router.post("/createShop", function(req,res,next){
+    console.log('createShop..', req.body);
+    next();
+},
+ decryptRequest, checkToken, function(req,res){
+    var createShopResult = {};
+    createShopResult.err = 0;
+    createShopResult.message = "Shop is created successfully";
+    if (!req.isAppToken){
+        createShopResult.err = 1;
+        createShopResult.message = "invalidRequest";
+    }    
+    res.send(JSON.stringify(createShopResult));
+
+});
 
 function decryptRequest(req, res, next) {
     var RSAKey = cryptico.RSAKey.parse(JSON.stringify(keyPair.private));
@@ -107,7 +122,6 @@ function decryptRequest(req, res, next) {
         req.invalidRequest = true;
         next();
     }
-
 }
 //  request bear fb_uid and app_token;
 function checkToken(req, res, next) {
@@ -211,6 +225,10 @@ function extendFbAccessToken(req, res, next) {
 }
 
 function writeImageToFile(req, res, next) {
+    if(!req.isAppToken){
+        next();
+        return;
+    }
     var type = req.body.u_type
     var _avatar_fileName = './public/shops/'+type+'/' + req.body.uid + '.png';    
     var b64_data = req.body.img.replace(/^data:image\/png;base64,/, "");    
@@ -226,6 +244,7 @@ function writeImageToFile(req, res, next) {
             writeFileResult.err = 1;
             writeFileResult.err.desc = err;
             }
+    writeFileResult.uploadType = type;
     req.writeFileResult = writeFileResult;
     next();    
     });
