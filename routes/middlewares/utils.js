@@ -13,8 +13,6 @@ var callbackURL = 'http://' + process.env.OPENSHIFT_APP_DNS + '/callback';
 var APP_ID = '203172309854130';
 var APP_SECRET = 'd3fd1a8f36378cd23637970796855301';
 
-// var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
-// var fs = require('fs');
 var superSecret = config.secret;
 var keyPair = config.keyPair;
 
@@ -155,21 +153,21 @@ function writeImageToFile(req, res, next) {
         return;
     }
     var type = req.body.u_type
-    var _avatar_fileName = './public/shops/'+type+'/' + req.body.uid + '.png';
+    var _image_fileName = './public/shops/'+type+'/' + req.body.uid + '.png';
     var fb_uid = req.body.uid;
     // Store in temporary cache and write to database
     if (map.has(fb_uid)){
-
+        var _obj = map.get(fb_uid);
+        _obj[type] = _image_fileName;        
     }
     // Write to file
-    var b64_data = req.body.img.replace(/^data:image\/png;base64,/, "");    
-    //console.log("file size: ",b64_data.length);
+    var b64_data = req.body.img.replace(/^data:image\/png;base64,/, "");
 
     writeFileResult = {};
     writeFileResult.file_length = b64_data.length;
     writeFileResult.err = 0;
     writeFileResult.err.desc = "";
-    fs.writeFile(_avatar_fileName, b64_data, 'base64', function(err) {        
+    fs.writeFile(_image_fileName, b64_data, 'base64', function(err) {        
         if(err){
             //res.sendStatus(500);
             writeFileResult.err = 1;
@@ -181,7 +179,6 @@ function writeImageToFile(req, res, next) {
     });
 }
 
-
 function MemberHandler(){
     var self = this;    
     setTimeout(function(){        
@@ -189,15 +186,13 @@ function MemberHandler(){
             map.remove(self.fb_uid);            
         }        
         self = undefined;
-    }, 1000*3600*24*2 )
-    // },2000 );
+    }, 1000*3600*24*2 )    
 }
 
-
 exports.hmap = map;
-exports. decryptRequest = decryptRequest;
-exports. checkToken = checkToken;
-exports. getToken = getToken;
+exports.decryptRequest = decryptRequest;
+exports.checkToken = checkToken;
+exports.getToken = getToken;
 exports.extendFbAccessToken = extendFbAccessToken;
-exports. writeImageToFile = writeImageToFile;
+exports.writeImageToFile = writeImageToFile;
 

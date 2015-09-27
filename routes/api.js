@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var utils = require('./middlewares/utils.js');
+var hmap = utils.hmap;
 
 router.get('/', function(req, res, next) {
     res.send('respond from api with a resource');
@@ -62,20 +63,30 @@ router.post("/uploadImage",utils.decryptRequest,utils.checkToken, utils.writeIma
     res.send(JSON.stringify(writeFileResult));
 });
 
-router.post("/createShop", function(req,res,next){
-    console.log('createShop..', req.body);
-    next();
-},
- utils.decryptRequest, utils.checkToken, function(req,res){
+router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req,res){
     var createShopResult = {};
     createShopResult.err = 0;
     createShopResult.message = "Shop is created successfully";
     if (!req.isAppToken){
         createShopResult.err = 1;
-        createShopResult.message = "invalidRequest";
+        createShopResult.message = "Cannot create a Shop: invalid Request";
+        res.send(JSON.stringify(createShopResult));
+        return;
+    }
+    if (hmap.has(req.body.uid)){
+        var update_Obj = hmap.get(req.body.uid);
+        for (var item in req.body){
+            if (!(item == "id"|| item == "token"|| item == "key"|| item == "data"||item == "uid")){
+                update_Obj[item] = req.body[item];
+            }
+        }
+        res.send(JSON.stringify(createShopResult));
+        // console.log("from create Shop:...: ", hmap.get(req.body.uid))
+        return;   
     }    
+    createShopResult.err = 2;
+    createShopResult.message = "Cannot create a Shop: unknown reasons";
     res.send(JSON.stringify(createShopResult));
-
 });
 
 
