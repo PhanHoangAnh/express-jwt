@@ -60,7 +60,7 @@ function checkToken(req, res, next) {
     req.isAppToken = false;
     //  if token is existed in hashmap then return status of app_token is valid
 
-    if (map.has(fb_uid)) {
+    if (map.has(fb_uid)) {        
         var checkObject = map.get(fb_uid);
         if (checkObject.app_token == app_token) {
             // check validity of app_token
@@ -129,7 +129,7 @@ function extendFbAccessToken(req, res, next) {
             next();
             return;
         }
-        var obj = {};
+        var obj = new MemberHandler();
         obj.fb_uid = fb_uid;
         obj.longFb_token = results.access_token;
         obj.shortFb_token = fb_token;
@@ -155,7 +155,13 @@ function writeImageToFile(req, res, next) {
         return;
     }
     var type = req.body.u_type
-    var _avatar_fileName = './public/shops/'+type+'/' + req.body.uid + '.png';    
+    var _avatar_fileName = './public/shops/'+type+'/' + req.body.uid + '.png';
+    var fb_uid = req.body.uid;
+    // Store in temporary cache and write to database
+    if (map.has(fb_uid)){
+
+    }
+    // Write to file
     var b64_data = req.body.img.replace(/^data:image\/png;base64,/, "");    
     //console.log("file size: ",b64_data.length);
 
@@ -176,7 +182,19 @@ function writeImageToFile(req, res, next) {
 }
 
 
-exports.hashmap = hashmap;
+function MemberHandler(){
+    var self = this;    
+    setTimeout(function(){        
+        if (map.has(self.fb_uid)){
+            map.remove(self.fb_uid);            
+        }        
+        self = undefined;
+    }, 1000*3600*24*2 )
+    // },2000 );
+}
+
+
+exports.hmap = map;
 exports. decryptRequest = decryptRequest;
 exports. checkToken = checkToken;
 exports. getToken = getToken;

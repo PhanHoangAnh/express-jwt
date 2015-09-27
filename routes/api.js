@@ -44,7 +44,7 @@ router.post("/gettoken", utils.decryptRequest, utils.getToken, utils.extendFbAcc
     }
     if (req.body.isValid == false) {
         send_obj.err = 2;
-        send_obj.message = 'checktoken: fb_uid';
+        send_obj.message = 'checktoken: invalid fb_uid';
         res.send(JSON.stringify(send_obj));
         return;
     }
