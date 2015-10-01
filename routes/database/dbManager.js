@@ -43,9 +43,10 @@ Shop.addItem = function(item){
 		shop = shop_maps.get(item.shop);
 	}else{
 		shop = new Shop();
+		shop.pathName = item.shop;
 	}	
-	var pos = getItem_byId(shop.items, item);
-	if(pos<0){
+	var pos = getItem_byId(shop.items, item);	
+	if(pos == -1){
 		shop.items.push(item);
 	}else{
 		shop.items[pos] = item;
@@ -59,8 +60,10 @@ Shop.removeItem = function(item){
 	shop.items.splice(pos,1);
 	for(var i = 0; i< item.categories.length;i++){
 		if (checkCat_inItems(item.categories[i], shop.items) == false){
-			shop.categories.splice(shop.categories.indexOf(item.categories[i]),1);
-			Shop.removeItem(shop, item);
+			shop.categories = shop.categories.splice(shop.categories.indexOf(item.categories[i]),1);
+			Category.removeItem(item, shop);
+		}else{
+			Category.removeItem(item);
 		}
 	}
 	shop_maps.set(shop.pathName, shop);
@@ -68,44 +71,44 @@ Shop.removeItem = function(item){
 
 // key property = _id
 function Item(){
-	this._id = mongoose.Types.ObjectId();
+	// this._id = mongoose.Types.ObjectId();
 };
 Item.prototype.shop = null;
 Item.prototype.categories = [];
 
 // key property = key;
 function Category(){
-	this._id =mongoose.Types.ObjectId();
+	// this._id =mongoose.Types.ObjectId();
 };
 Category.prototype.items = [];
 Category.prototype.shops = [];
 Category.addItem = function(item){
 	var category;
 	for (var i = 0 ; i < item.categories.length ; i ++){
-		if (category_maps.has(item.category_arrs[i])){
-			category = category_maps.get(item.categories[i]);
+		if (category_maps.has(item.categories[i])){
+			category = category_maps.get(item.categories[i]);			
 		}else{
 			category = new Category();
+			category.shops = [item.shop];
+			category.items = [item._id];
 		}
-		var pos = getItem_byId(category.items, item);
-		if(pos<0){
-			category.items.push(item);
-		}else{
-			category.items[pos] = item;
+		var pos = category.items.indexOf(item._id);
+		if(pos== -1){
+			category.items.push(item._id);
 		}
-		category.shops = arrayUnique(category.shop_arrs, item.shop);
+				
+		category.shops = arrayUnique(category.shops, new Array(item.shop));
 		category_maps.set(item.categories[i], category);
 	}
 }
 
-Category.removeItem = function(shop,item){
+Category.removeItem = function(item, shop){
 	category_maps.forEach(function(val,key){
-		var pos = getItem_byId(val.items,item);
-		if (pos != -1){
+		var pos = val.items.indexOf(item._id);		
+		if (pos != -1){			
 			val.items.splice(pos, 1);
 		}
-		val.shops.splice(val.shops.indexOf(shop.pathName),1);
-		if(val.shops.length == 0){
+		if(val.items.length == 0){
 			category_maps.remove(key);
 		}else{
 			category_maps.set(key, val);
@@ -113,15 +116,21 @@ Category.removeItem = function(shop,item){
 	});
 }
 
-function updateItem(updateObj){	
+function updateItem(updateObj, fn){		
 	item_maps.set(updateObj._id, updateObj);
 	Shop.addItem(updateObj);
 	Category.addItem(updateObj);
+	if(fn){
+		fn(shop_maps,item_maps,category_maps);
+	}
 }
 
-function removeItem(item){
+function removeItem(item, fn){
 	item_maps.remove(item._id);
 	Shop.removeItem(item);
+	if (fn){
+		fn(shop_maps,item_maps,category_maps);	
+	}
 }
 
 function addShop (shop){
