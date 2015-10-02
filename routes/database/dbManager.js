@@ -12,16 +12,6 @@ function arrayUnique(a, b) {
     }));
 }
 
-function getItem_byId(item_arrs, item){
-	var i = 0;
-	for (i = 0 ; i < item_arrs.length; i ++){
-		if (item_arrs[i]._id == item._id){
-			return i;
-		}
-	}
-	return -1;
-}
-
 function checkCat_inItems(cat, items){
 	for (i = 0 ; i< items.length; i++){
 		if (items[i].categories.indexOf(cat) != -1){
@@ -45,7 +35,7 @@ Shop.addItem = function(item){
 		shop = new Shop();
 		shop.pathName = item.shop;
 	}	
-	var pos = getItem_byId(shop.items, item);	
+	var pos = shop.items.indexOf(item._id);	
 	if(pos == -1){
 		shop.items.push(item);
 	}else{
@@ -53,20 +43,22 @@ Shop.addItem = function(item){
 	}
 	shop.categories = arrayUnique(shop.categories, item.categories);
 	shop_maps.set(item.shop, shop);
+	// update to database
 };
 Shop.removeItem = function(item){
 	var shop = shop_maps.get(item.shop);
-	var pos = getItem_byId(shop.items,item);
+	var pos = shop.items.indexOf(item._id);
 	shop.items.splice(pos,1);
 	for(var i = 0; i< item.categories.length;i++){
 		if (checkCat_inItems(item.categories[i], shop.items) == false){
 			shop.categories = shop.categories.splice(shop.categories.indexOf(item.categories[i]),1);
-			Category.removeItem(item, shop);
+			Category.removeItem(item, shop.pathName);
 		}else{
 			Category.removeItem(item);
 		}
 	}
 	shop_maps.set(shop.pathName, shop);
+	// update to database
 }
 
 // key property = _id
@@ -95,16 +87,19 @@ Category.addItem = function(item){
 		var pos = category.items.indexOf(item._id);
 		if(pos== -1){
 			category.items.push(item._id);
-		}
-				
+		}				
 		category.shops = arrayUnique(category.shops, new Array(item.shop));
 		category_maps.set(item.categories[i], category);
+		// update to database
 	}
 }
 
 Category.removeItem = function(item, shop){
 	category_maps.forEach(function(val,key){
-		var pos = val.items.indexOf(item._id);		
+		var pos = val.items.indexOf(item._id);
+		if(shop){			
+			val.shops.splice(val.shops.indeOf(shop),1);
+		}
 		if (pos != -1){			
 			val.items.splice(pos, 1);
 		}
@@ -113,6 +108,7 @@ Category.removeItem = function(item, shop){
 		}else{
 			category_maps.set(key, val);
 		}
+		// update to database
 	});
 }
 
@@ -123,6 +119,7 @@ function updateItem(updateObj, fn){
 	if(fn){
 		fn(shop_maps,item_maps,category_maps);
 	}
+	// update to database
 }
 
 function removeItem(item, fn){
@@ -131,14 +128,24 @@ function removeItem(item, fn){
 	if (fn){
 		fn(shop_maps,item_maps,category_maps);	
 	}
+	// update to database
 }
 
 function addShop (shop){
 	shop._id =mongoose.Types.ObjectId();
 	shop_maps.set(shop.pathName, shop);
+	// update to database
 }
 
+function removeShop(shop){
+	for (var i = 0; i< shop.items.length; i ++){
+		removeItem(shop.items[i]);
+	}
+	shop_maps.remove(shop.pathName);
+	// update to database
+}
 
 exports.updateItem = updateItem;
 exports.removeItem = removeItem;
 exports.addShop = addShop;
+exports.removeShop = removeShop;

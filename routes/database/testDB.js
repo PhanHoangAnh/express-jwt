@@ -13,7 +13,7 @@ function createItems() {
     for (var i = 0; i < 3; i++) {
         var categories_arr = [];
         for (var i = 0; i < 10; i++) {
-            //categories_arr.push(randomstring.generate(5));
+            // categories_arr.push(randomstring.generate(5));
             categories_arr.push("abcdef" + i.toString());
             // console.log("categories_arr: ", categories_arr[i])
         };
@@ -32,15 +32,13 @@ for (var i = 0; i < 3; i++) {
 }
 
 
-
-
 function displayResult(item) {
     // console.log("sample item: ", item);
     dbManager.updateItem(item, function(shops, items, categories) {
         // check(categories);
         console.log('----------------- Shop --------------------');
         shops.forEach(function(val, key) {
-            // console.log(key, '\n from shop.pathName:', val.pathName, "\n from Shop.items: ", val.items, '\n from Shop.categories:', val.categories);
+            console.log(key, '\n from shop.pathName:', val.pathName, "\n from Shop.items: ", val.items, '\n from Shop.categories:', val.categories);
         })
         var result = shops.has(handle_items[0].shop);
         console.log("has shop: ? ", result);
@@ -94,7 +92,6 @@ dbManager.removeItem(handle_items[1], function (shops, items, categories){
 	console.log('detailed categories: \n', categories.values());
 
 })
-
 
 
 var a = ['a', 'b', 'c'];
