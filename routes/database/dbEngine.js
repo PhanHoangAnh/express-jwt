@@ -5,13 +5,13 @@ var Schema = mongoose.Schema;
 
 var Shop_schema = new Schema({
     _id             : Schema.Types.ObjectId,
-    fb_uid          : String,    
+    fb_uid          : { type : String , unique : true, required : true, dropDups: true },
     avatars         : String,
     walls           : String,
     longitude       : String,
     latitude        : String,
     pathName        : String,
-    showName        : { type: String, unique: true },
+    showName        : { type : String , unique : true, required : true, dropDups: true },
     slogan          : String,
     companyName     : String,
     shop_description: String,

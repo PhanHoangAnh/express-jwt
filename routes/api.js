@@ -2,14 +2,15 @@ var express = require('express');
 var router = express.Router();
 var utils = require('./middlewares/utils.js');
 var hmap = utils.hmap;
+var hashmap = require("hashmap");
+var dbManager = require("./database/dbManager.js");
 
 router.get('/', function(req, res, next) {
     res.send('respond from api with a resource');
 });
 
 //  request bear fb_uid and app_token;
-router.post("/checktoken", utils.decryptRequest, utils.checkToken, function(req, res, next) {
-
+router.post("/checktoken", utils.decryptRequest, utils.checkToken, isShopExisted, function(req, res, next) {
     var send_obj = {};
     if (req.invalidRequest == true) {
         send_obj.err = 1;
@@ -22,7 +23,11 @@ router.post("/checktoken", utils.decryptRequest, utils.checkToken, function(req,
         send_obj.message = 'checktoken: invalidToken';
         res.send(JSON.stringify(send_obj));
         return;
-    } else {
+    } else {        
+        if (req.shop != null || req.shop != undefined) {
+            send_obj.shop = req.shop;
+            send_obj.isShop = 1;
+        }
         send_obj.err = 0;
         send_obj.message = 'checktoken: validToken';
         res.send(JSON.stringify(send_obj));
@@ -34,7 +39,7 @@ router.post("/checktoken", utils.decryptRequest, utils.checkToken, function(req,
 });
 
 //  request bear fb_uid and fb_shortToken
-router.post("/gettoken", utils.decryptRequest, utils.getToken, utils.extendFbAccessToken, function(req, res, next) {
+router.post("/gettoken", utils.decryptRequest, utils.getToken, utils.extendFbAccessToken, isShopExisted, function(req, res, next) {
     var send_obj = {}
     if (req.invalidRequest == true) {
         // res.sendStatus(400);
@@ -48,8 +53,11 @@ router.post("/gettoken", utils.decryptRequest, utils.getToken, utils.extendFbAcc
         send_obj.message = 'checktoken: invalid fb_uid';
         res.send(JSON.stringify(send_obj));
         return;
+    }    
+    if (req.shop != null || req.shop != undefined) {
+        send_obj.shop = req.shop;
+        send_obj.isShop = 1;
     }
-
     encryptObject = req.body.encryptObject;
     send_obj.err = 0;
     send_obj.message = "ok";
@@ -58,36 +66,61 @@ router.post("/gettoken", utils.decryptRequest, utils.getToken, utils.extendFbAcc
     // res.send('respond from api/gettoken with a resource');
 });
 
-router.post("/uploadImage",utils.decryptRequest,utils.checkToken, utils.writeImageToFile, function(req,res,next){
+
+router.post("/uploadImage", utils.decryptRequest, utils.checkToken, utils.writeImageToFile, function(req, res, next) {
     writeFileResult = req.writeFileResult;
     res.send(JSON.stringify(writeFileResult));
 });
 
-router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req,res){
+router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req, res) {
     var createShopResult = {};
     createShopResult.err = 0;
     createShopResult.message = "Shop is created successfully";
-    if (!req.isAppToken){
+    if (!req.isAppToken) {
         createShopResult.err = 1;
         createShopResult.message = "Cannot create a Shop: invalid Request";
         res.send(JSON.stringify(createShopResult));
         return;
     }
-    if (hmap.has(req.body.uid)){
+    if (hmap.has(req.body.uid)) {
         var update_Obj = hmap.get(req.body.uid);
-        for (var item in req.body){
-            if (!(item == "id"|| item == "token"|| item == "key"|| item == "data"||item == "uid")){
+        for (var item in req.body) {
+            if (!(item == "id" || item == "token" || item == "key" || item == "data")) {
                 update_Obj[item] = req.body[item];
             }
         }
+        // Update to ShopManager and write down to database
+        dbManager.addShop(update_Obj, function(err, msg) {
+                // console.log("from router.post /createShop:", err, msg);
+            });            
         res.send(JSON.stringify(createShopResult));
-        // console.log("from create Shop:...: ", hmap.get(req.body.uid))
-        return;   
-    }    
+        return;
+    }
     createShopResult.err = 2;
     createShopResult.message = "Cannot create a Shop: unknown reasons";
     res.send(JSON.stringify(createShopResult));
 });
 
-
+function isShopExisted(req, res, next) {    
+    // if(req.body.fromCreateNewShop != 1){
+    //     next();
+    //     return;
+    // }
+    dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {        
+        if (obj != null || obj != undefined) {
+            req.shop = {};
+            for (var i in obj) {
+                // console.log("checkShopWithFb_Uid:", i, obj[i]);
+                if (!(i == "fb_uid" || i == "uid" || i == "items")) {
+                    req.shop[i] = obj[i];
+                }
+            }
+            // console.log("checkShopWithFb_Uid", req.shop);
+            next();
+            return;
+        }
+        req.shop = null;
+        next();
+    })
+}
 module.exports = router;

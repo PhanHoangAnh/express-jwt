@@ -73,7 +73,7 @@ Shop.removeItem = function(item, fn) {
     shop.items.splice(pos, 1);
     for (var i = 0; i < item.categories.length; i++) {
         if (checkCat_inItems(item.categories[i], shop.items) == false) {
-        	shop.categories.splice(shop.categories.indexOf(item.categories[i]), 1);            
+            shop.categories.splice(shop.categories.indexOf(item.categories[i]), 1);
             Category.removeItem(item, shop.pathName);
         } else {
             Category.removeItem(item);
@@ -145,6 +145,7 @@ function updateItem(updateObj, fn) {
     if (updateObj.shop == null || updateObj.shop == undefined || !shop_maps.has(updateObj.shop)) {
         return fn(1, 'invalid pathName');
     }
+
     item_maps.set(updateObj._id, updateObj);
     Shop.addItem(updateObj);
     Category.addItem(updateObj);
@@ -172,14 +173,21 @@ function addShop(shop, fn) {
     if (shop.pathName == null || shop.pathName == undefined) {
         return fn(1, 'invalid pathName');
     }
-    if (shop_maps.has(shop.pathName)) {
-        return fn(2, 'invalid pathName');
-    }
-    shop._id = mongoose.Types.ObjectId();
-    shop_maps.set(shop.pathName, shop);
-    fn(null, null);
-    // update to database
-    ShopToDb(shop, false);
+    checkShopWithFb_Uid(shop.fb_uid, function(err, objs) {
+        if (objs == null) {
+            shop._id = mongoose.Types.ObjectId();
+            shop_maps.set(shop.pathName, shop);
+            fn(null, null);
+            // update to database
+            ShopToDb(shop, false);
+        } else {
+            shop._id = objs._id;
+            shop_maps.set(objs.pathName, shop);
+            ShopToDb(shop, true);
+            fn(null, objs);
+            return;
+        }
+    });
 }
 
 function removeShop(shop, fn) {
@@ -210,7 +218,10 @@ function ShopToDb(shop, isUpdate, fn) {
                 fn(2, err);
                 return;
             }
-            sh = shop;
+            // sh = shop;
+            for(var i in shop){
+                sh[i] = shop[i];
+            }
             sh.save(function(error) {
                 if (error && fn) {
                     fn(3, error);
@@ -225,7 +236,22 @@ function ShopToDb(shop, isUpdate, fn) {
 
 }
 
+function checkShopWithFb_Uid(_uid, cb) {
+    var Shop = mongoose.model('Shops');
+    Shop.findOne({
+        fb_uid: _uid
+    }, function(err, obj) {        
+        if (obj) {
+            cb(0, obj.toObject());
+            return true;
+        }
+        cb(1, null);
+        return false;
+    });
+}
+
 exports.updateItem = updateItem;
 exports.removeItem = removeItem;
 exports.addShop = addShop;
 exports.removeShop = removeShop;
+exports.checkShopWithFb_Uid = checkShopWithFb_Uid;

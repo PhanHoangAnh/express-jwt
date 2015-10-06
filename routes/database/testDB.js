@@ -18,7 +18,7 @@ for (var i = 0; i < 3; i++) {
 function createNewShop() {
     var shopObj = new Shop;
     // shopObj._id = mongoose.Types.ObjectId();
-    shopObj.fb_uid = randomstring.generate(7);
+    shopObj.fb_uid =  1234567//randomstring.generate(7);
     shopObj.avatars = randomstring.generate(7);
     shopObj.walls = randomstring.generate(7);
     shopObj.longitude = randomstring.generate(7);
@@ -40,7 +40,7 @@ function createNewShop() {
     }
     dbManager.addShop(shopObj, function(err, msg) {
         if (err) {
-            console.log(msg);
+            console.log("From test: ",msg);
         }
     })
     return shopObj;
@@ -135,19 +135,20 @@ setTimeout(function() {
 }, 500);
 
 function removeItem() {
-    dbManager.removeItem(handle_items[1], function(shops, items, categories, err, shop) {        
+    dbManager.removeItem(handle_items[0], function(shops, items, categories, err, shop) {        
 
         if (err) {
             console.log(err, shop);
-            var shop = shops.get(handle_items[1].pathName);
+            var shop = shops.get(handle_items[0].pathName);
             console.log(shop);
-            console.log(shop.items.indexOf(handle_items._id));
+            return;
+            // console.log(shop.items.indexOf(handle_items._id));
         }
-        var result = items.has(handle_items[1]);
+        var result = items.has(handle_items[0]);
         console.log(result);
         categories.forEach(function(val, key) {
             for (var i = 0; i < val.items.length; i++) {
-                if (val.items[i] == handle_items[1]._id) {
+                if (val.items[i] == handle_items[0]._id) {
                     console.log(val);
                 }
                 // }else{

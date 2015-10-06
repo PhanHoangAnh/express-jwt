@@ -2,8 +2,6 @@ var express = require('express');
 var router = express.Router();
 var config = require('./middlewares/config.js');
 
-// var fs = require('fs');
-// var keyPair = JSON.parse(fs.readFileSync('temp', 'utf8'));
 
 keyPair = config.keyPair;
 
