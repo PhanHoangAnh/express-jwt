@@ -4,6 +4,7 @@ var utils = require('./middlewares/utils.js');
 var hmap = utils.hmap;
 var hashmap = require("hashmap");
 var dbManager = require("./database/dbManager.js");
+var mongoose = require('mongoose');
 
 router.get('/', function(req, res, next) {
     res.send('respond from api with a resource');
@@ -100,6 +101,43 @@ router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req,
     createShopResult.message = "Cannot create a Shop: unknown reasons";
     res.send(JSON.stringify(createShopResult));
 });
+
+router.post('/updateItem',utils.decryptRequest, utils.checkToken, function(req,res,next){
+    var createItemResult = {};
+    createItemResult.err = 0;
+    createItemResult.message = "Item is updated successfully";
+    if (!req.isAppToken) {
+        createItemResult.err = 1;
+        createItemResult.message = "Cannot create a Item: invalid Request";
+        res.send(JSON.stringify(createItemResult));
+        return;
+    }    
+    var item = req.body.item;
+    dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {
+        //1. getShop information to compare pathNaame, fb_uid
+        if(err || obj.fb_uid != req.body.uid|| item.shop != obj.pathName){
+            createItemResult.err = 2;
+            createItemResult.message = "Cannot create a Item: invalid Shop";
+            res.send(JSON.stringify(createItemResult));
+            return;
+        }
+        //2. update information of Item to Shop    
+        
+        if(item._id == null || item._id == undefined){
+            item._id = mongoose.Types.ObjectId();
+        }
+        dbManager.updateItem(item,function(err, msg){
+            if (err == 1){
+                console.log(err);
+                res.sendStatus(msg);
+            }
+            else{
+                console.log("from api updateItem",err)
+                res.send("okie");
+            }
+        });
+    });
+})
 
 function isShopExisted(req, res, next) {    
     // if(req.body.fromCreateNewShop != 1){

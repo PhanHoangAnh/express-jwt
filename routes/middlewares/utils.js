@@ -148,18 +148,24 @@ function extendFbAccessToken(req, res, next) {
 }
 
 function writeImageToFile(req, res, next) {
-    if(!req.isAppToken){
+    if(!req.isAppToken){        
         next();
         return;
     }
+    var _image_fileName
     var type = req.body.u_type
-    var _image_fileName = './public/shops/'+type+'/' + req.body.uid + '.png';
+    if (type == "Products"){
+        _image_fileName = './public/products/' + req.body.imgName + '.png';
+    }else{
+        _image_fileName = './public/shops/'+type+'/' + req.body.uid + '.png';
+            if (map.has(fb_uid)){
+            var _obj = map.get(fb_uid);
+            _obj[type] = _image_fileName;        
+        }
+    }
     var fb_uid = req.body.uid;
     // Store in temporary cache and write to database
-    if (map.has(fb_uid)){
-        var _obj = map.get(fb_uid);
-        _obj[type] = _image_fileName;        
-    }
+
     // Write to file
     var b64_data = req.body.img.replace(/^data:image\/png;base64,/, "");
 
@@ -174,7 +180,7 @@ function writeImageToFile(req, res, next) {
             writeFileResult.err.desc = err;
             }
     writeFileResult.uploadType = type;
-    req.writeFileResult = writeFileResult;
+    req.writeFileResult = writeFileResult;    
     next();    
     });
 }

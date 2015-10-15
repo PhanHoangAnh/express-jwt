@@ -142,17 +142,37 @@ Category.removeItem = function(item, shop) {
 }
 
 function updateItem(updateObj, fn) {
-    if (updateObj.shop == null || updateObj.shop == undefined || !shop_maps.has(updateObj.shop)) {
-        return fn(1, 'invalid pathName');
-    }
 
-    item_maps.set(updateObj._id, updateObj);
-    Shop.addItem(updateObj);
-    Category.addItem(updateObj);
-    if (fn) {
-        fn(shop_maps, item_maps, category_maps);
-    }
-    // update to database
+	if (updateObj.shop == null || updateObj.shop == undefined) {
+		return fn(1, 'invalid pathName');
+	}
+	if(!shop_maps.has(updateObj.shop)){
+		var m_Shop = mongoose.model('Shops');
+		m_Shop.findOne({pathName:updateObj.shop},function(err, shop){			
+			if (err){
+				return fn(1, 'invalid pathName'); 
+			}
+			else{
+				shop_maps.set(shop.pathName, shop);
+				uItem();
+			}
+		});
+	}else{
+		uItem();
+	}
+	function uItem(){
+		// 
+		item_maps.set(updateObj._id, updateObj);
+		Shop.addItem(updateObj, function(err, msg){
+			if (err){
+				return fn(err, msg);
+			}
+		});
+		Category.addItem(updateObj);
+		if (fn) {
+			return fn(shop_maps, item_maps, category_maps);
+		}
+	}
 }
 
 function removeItem(item, fn) {

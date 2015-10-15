@@ -15,7 +15,13 @@ router.get('/', function(req, res, next) {
 	    // basicURL: 'localhost.io:3000'
 	});
 
+});
 
+
+router.get("/addItem", function(req, res, next){
+   res.render('addItem.ejs', { 
+  	data: keyPair.public,
+  	title: "addItem" });   
 });
 
 module.exports = router;
