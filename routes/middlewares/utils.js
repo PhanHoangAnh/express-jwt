@@ -58,7 +58,7 @@ function checkToken(req, res, next) {
     req.isAppToken = false;
     //  if token is existed in hashmap then return status of app_token is valid
 
-    if (map.has(fb_uid)) {        
+    if (map.has(fb_uid)) {
         var checkObject = map.get(fb_uid);
         if (checkObject.app_token == app_token) {
             // check validity of app_token
@@ -74,7 +74,7 @@ function checkToken(req, res, next) {
             req.isAppToken = true;
             next();
             return;
-        }        
+        }
         next();
     }
 }
@@ -148,51 +148,50 @@ function extendFbAccessToken(req, res, next) {
 }
 
 function writeImageToFile(req, res, next) {
-    if(!req.isAppToken){        
+    if (!req.isAppToken) {
         next();
         return;
     }
     var _image_fileName
     var type = req.body.u_type
-    if (type == "Products"){
+    if (type == "Products") {
         _image_fileName = './public/products/' + req.body.imgName + '.png';
-    }else{
-        _image_fileName = './public/shops/'+type+'/' + req.body.uid + '.png';
-            if (map.has(fb_uid)){
+    } else {
+        _image_fileName = './public/shops/' + type + '/' + req.body.uid + '.png';
+        // Store in temporary cache and write to database
+        var fb_uid = req.body.uid;
+        if (map.has(fb_uid)) {
             var _obj = map.get(fb_uid);
-            _obj[type] = _image_fileName;        
+            _obj[type] = _image_fileName;
         }
     }
-    var fb_uid = req.body.uid;
-    // Store in temporary cache and write to database
 
     // Write to file
     var b64_data = req.body.img.replace(/^data:image\/png;base64,/, "");
-
     writeFileResult = {};
     writeFileResult.file_length = b64_data.length;
     writeFileResult.err = 0;
     writeFileResult.err.desc = "";
-    fs.writeFile(_image_fileName, b64_data, 'base64', function(err) {        
-        if(err){
+    fs.writeFile(_image_fileName, b64_data, 'base64', function(err) {
+        if (err) {
             //res.sendStatus(500);
             writeFileResult.err = 1;
             writeFileResult.err.desc = err;
-            }
-    writeFileResult.uploadType = type;
-    req.writeFileResult = writeFileResult;    
-    next();    
+        }
+        writeFileResult.uploadType = type;
+        req.writeFileResult = writeFileResult;
+        next();
     });
 }
 
-function MemberHandler(){
-    var self = this;    
-    setTimeout(function(){        
-        if (map.has(self.fb_uid)){
-            map.remove(self.fb_uid);            
-        }        
+function MemberHandler() {
+    var self = this;
+    setTimeout(function() {
+        if (map.has(self.fb_uid)) {
+            map.remove(self.fb_uid);
+        }
         self = undefined;
-    }, 1000*3600*24*2 )    
+    }, 1000 * 3600 * 24 * 2)
 }
 
 exports.hmap = map;
@@ -201,4 +200,3 @@ exports.checkToken = checkToken;
 exports.getToken = getToken;
 exports.extendFbAccessToken = extendFbAccessToken;
 exports.writeImageToFile = writeImageToFile;
-

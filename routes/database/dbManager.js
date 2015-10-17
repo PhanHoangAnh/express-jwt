@@ -5,6 +5,23 @@ var item_maps = new hashmap();
 var category_maps = new hashmap();
 var dbEngine = require("./dbEngine.js");
 
+function init(){
+    var _shop = mongoose.model('Shops');
+    _shop.find({},function(err, shops){
+        shops.forEach( function(s){
+            if(!s.items){
+                s.items = [];
+            }
+            shop_maps.set(s.pathName, s);
+            for (var i = 0; i < s.items.length; i ++){
+                item_maps.set(s.items[i]._id.toString(), s.items[i]);
+                Category.addItem(s.items[i]);
+            }
+        })
+    })
+}
+
+init();
 // From http://stackoverflow.com/questions/1584370/how-to-merge-two-arrays-in-javascript-and-de-duplicate-items
 function arrayUnique(a, b) {
     return c = a.concat(b.filter(function(item) {
@@ -37,19 +54,26 @@ Shop.addItem = function(item, fn) {
     if (shop_maps.has(item.shop)) {
         shop = shop_maps.get(item.shop);
     } else {
-        shop = new Shop();
-        shop.pathName = item.shop;
+        // shop = new Shop();
+        // shop.pathName = item.shop;
+        fn(1, "cannot find a Shop, from Shop.addItem");
     }
-    var pos = shop.items.indexOf(item);
-    if (pos == -1) {
+
+    var checkFlag = false;
+    for(var i = 0; i< shop.items.length; i++){
+        if(shop.items[i]._id == item._id){
+            checkFlag = true
+            shop.items[i]= item;
+        }
+    }
+    if(checkFlag==false){
         shop.items.push(item);
-    } else {
-        shop.items[pos] = item;
     }
+    
     shop.categories = arrayUnique(shop.categories, item.categories);
     shop_maps.set(item.shop, shop);
     setTimeout(function() {
-        ShopToDb(shop, true);
+        ShopToDb(shop, true);        
     }, 200);
     if (fn) {
         fn(null, "item is added successfully");
@@ -143,37 +167,41 @@ Category.removeItem = function(item, shop) {
 
 function updateItem(updateObj, fn) {
 
-	if (updateObj.shop == null || updateObj.shop == undefined) {
-		return fn(1, 'invalid pathName');
-	}
-	if(!shop_maps.has(updateObj.shop)){
-		var m_Shop = mongoose.model('Shops');
-		m_Shop.findOne({pathName:updateObj.shop},function(err, shop){			
-			if (err){
-				return fn(1, 'invalid pathName'); 
-			}
-			else{
-				shop_maps.set(shop.pathName, shop);
-				uItem();
-			}
-		});
-	}else{
-		uItem();
-	}
-	function uItem(){
-		// 
-		item_maps.set(updateObj._id, updateObj);
-		Shop.addItem(updateObj, function(err, msg){
-			if (err){
-				return fn(err, msg);
-			}
-		});
-		Category.addItem(updateObj);
-		if (fn) {
-			return fn(shop_maps, item_maps, category_maps);
-		}
-	}
+    if (updateObj.shop == null || updateObj.shop == undefined) {
+        return fn(1, 'invalid pathName');
+    }
+    if (!shop_maps.has(updateObj.shop)) {
+        var m_Shop = mongoose.model('Shops');
+        m_Shop.findOne({
+            pathName: updateObj.shop
+        }, function(err, shop) {
+            if (err) {
+                return fn(1, 'invalid pathName');
+            } else {
+                shop_maps.set(shop.pathName, shop);
+                f_update();
+            }
+        });
+    } else {
+        f_update();
+    }
+
+    function f_update() {
+        // 
+        item_maps.set(updateObj._id.toString(), updateObj);
+        Shop.addItem(updateObj, function(err, msg) {
+            if (err) {
+                return fn(err, msg);
+            }
+        });
+        Category.removeItem(updateObj, updateObj.shop);
+        Category.addItem(updateObj);
+        if (fn) {
+            return fn(shop_maps, item_maps, category_maps);
+        }
+    }
 }
+
 
 function removeItem(item, fn) {
     if (item.shop == null || item.shop == undefined || !shop_maps.has(item.shop)) {
@@ -238,10 +266,12 @@ function ShopToDb(shop, isUpdate, fn) {
                 fn(2, err);
                 return;
             }
-            // sh = shop;
+            // sh = shop;            
             for(var i in shop){
                 sh[i] = shop[i];
             }
+            sh.markModified('items');
+            sh.markModified('categories');
             sh.save(function(error) {
                 if (error && fn) {
                     fn(3, error);
@@ -275,3 +305,4 @@ exports.removeItem = removeItem;
 exports.addShop = addShop;
 exports.removeShop = removeShop;
 exports.checkShopWithFb_Uid = checkShopWithFb_Uid;
+exports.item_maps = item_maps;

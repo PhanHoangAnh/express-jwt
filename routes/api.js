@@ -5,6 +5,7 @@ var hmap = utils.hmap;
 var hashmap = require("hashmap");
 var dbManager = require("./database/dbManager.js");
 var mongoose = require('mongoose');
+var trim = require('trim');
 
 router.get('/', function(req, res, next) {
     res.send('respond from api with a resource');
@@ -106,13 +107,14 @@ router.post('/updateItem',utils.decryptRequest, utils.checkToken, function(req,r
     var createItemResult = {};
     createItemResult.err = 0;
     createItemResult.message = "Item is updated successfully";
-    if (!req.isAppToken) {
+    var item = req.body.item;
+    if (!req.isAppToken || !item._productId) {
         createItemResult.err = 1;
         createItemResult.message = "Cannot create a Item: invalid Request";
         res.send(JSON.stringify(createItemResult));
         return;
     }    
-    var item = req.body.item;
+    
     dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {
         //1. getShop information to compare pathNaame, fb_uid
         if(err || obj.fb_uid != req.body.uid|| item.shop != obj.pathName){
@@ -121,19 +123,32 @@ router.post('/updateItem',utils.decryptRequest, utils.checkToken, function(req,r
             res.send(JSON.stringify(createItemResult));
             return;
         }
-        //2. update information of Item to Shop    
-        
-        if(item._id == null || item._id == undefined){
-            item._id = mongoose.Types.ObjectId();
+        //1.b   normalize and validate obj properties
+        // a Items
+        if (item.hasOwnProperty('categories') && item.categories.constructor === Array){
+            for(var i = 0; i < item.categories.length; i++){
+                item.categories[i] = trim(item.categories[i]);
+            }
+        }else if(!item.categories.constructor === Array){
+            createItemResult.err = 3;
+            createItemResult.message = "Cannot create a Item: invalid categories type";
+            res.send(JSON.stringify(createItemResult));
+            return;   
         }
+        
+        // b Categories
+        //2.    update information of Item to Shop          
+        var _id = item._productId;
+        
+        item._id = _id;
+        
         dbManager.updateItem(item,function(err, msg){
             if (err == 1){
                 console.log(err);
                 res.sendStatus(msg);
             }
-            else{
-                console.log("from api updateItem",err)
-                res.send("okie");
+            else{                
+                res.send(JSON.stringify(createItemResult));
             }
         });
     });
