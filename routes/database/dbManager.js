@@ -49,6 +49,7 @@ Shop.addItem = function(item, fn) {
         if (fn) {
             fn(1, "missing item._id");
         }
+        return;
     }
     var shop;
     if (shop_maps.has(item.shop)) {
@@ -59,7 +60,13 @@ Shop.addItem = function(item, fn) {
         fn(1, "cannot find a Shop, from Shop.addItem");
     }
 
-    var checkFlag = false;
+    var checkFlag = false;    
+    if (!(shop.items && shop.items.constructor === Array)){
+        if (fn) {
+            fn(2, "missing item array of Shop");
+        }
+        return;
+    }
     for(var i = 0; i< shop.items.length; i++){
         if(shop.items[i]._id == item._id){
             checkFlag = true
@@ -69,7 +76,12 @@ Shop.addItem = function(item, fn) {
     if(checkFlag==false){
         shop.items.push(item);
     }
-    
+    if(!(shop.categories&&shop.categories.constructor === Array)||!(item.categories&&item.categories.constructor===Array)){
+        if (fn) {
+            fn(3, "missing item array of categories");
+        }
+        return;   
+    }
     shop.categories = arrayUnique(shop.categories, item.categories);
     shop_maps.set(item.shop, shop);
     setTimeout(function() {
@@ -86,15 +98,30 @@ Shop.removeItem = function(item, fn) {
         }
         return;
     }
-    var shop = shop_maps.get(item.shop);
-    var pos = shop.items.indexOf(item);
-    if (pos == -1) {
-        if (fn) {
-            fn(2, 'invalid item._id');
+    var shop = shop_maps.get(item.shop);    
+    if(!(shop.items&&shop.items.constructor===Array)||!(shop.items&&shop.items.constructor===Array)||!(shop.categories&&shop.categories.constructor===Array)){
+      if (fn) {
+            fn(2, 'invalid shop properties');
         }
-        return;
-    };
-    shop.items.splice(pos, 1);
+        return;  
+    }
+    var _item;
+    for(var i = 0; i< shop.items.length; i++){
+        if(shop.items[i]._id == item._id){
+            checkFlag = true
+            // shop.items[i]= item;
+            _item = shop[i];
+            var pos = shop.items.indexOf(item);
+            shop.items.splice(pos, 1);
+        }
+    }
+    if(!item ||!(item.categories&&item.categories.constructor === Array)){
+        if (fn) {
+            fn(3, 'invalid item');
+        }
+        return;     
+    }
+    // shop.items.splice(pos, 1);
     for (var i = 0; i < item.categories.length; i++) {
         if (checkCat_inItems(item.categories[i], shop.items) == false) {
             shop.categories.splice(shop.categories.indexOf(item.categories[i]), 1);
@@ -103,12 +130,10 @@ Shop.removeItem = function(item, fn) {
             Category.removeItem(item);
         }
     }
-    shop_maps.set(shop.pathName, shop);
     if (fn) {
-        fn(null, shop);
+        fn(0, null);
     }
-    // update to database
-
+    // update to database    
     setTimeout(function() {
         ShopToDb(shop, true);
     }, 200);
@@ -208,9 +233,9 @@ function removeItem(item, fn) {
         return fn(1, 'invalid pathName');
     }
     item_maps.remove(item._id);
-    Shop.removeItem(item, function(err, shop) {
+    Shop.removeItem(item, function(err, msg) {
         if (fn) {
-            fn(shop_maps, item_maps, category_maps, err, shop);
+            fn(err, msg);
         }
     });
 
@@ -261,7 +286,7 @@ function ShopToDb(shop, isUpdate, fn) {
             }
         });
     } else {
-        Shop.findById(shop._id, function(err, sh) {
+        Shop.findById(shop._id, function(err, sh) {            
             if (err && fn) {
                 fn(2, err);
                 return;

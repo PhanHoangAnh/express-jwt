@@ -168,7 +168,7 @@ function writeImageToFile(req, res, next) {
 
     // Write to file
     var b64_data = req.body.img.replace(/^data:image\/png;base64,/, "");
-    writeFileResult = {};
+    var writeFileResult = {};
     writeFileResult.file_length = b64_data.length;
     writeFileResult.err = 0;
     writeFileResult.err.desc = "";
@@ -181,6 +181,17 @@ function writeImageToFile(req, res, next) {
         writeFileResult.uploadType = type;
         req.writeFileResult = writeFileResult;
         next();
+    });
+}
+
+function removeImageFile(imgName, fn){
+    console.log(imgName);    
+    var removeFileResult = {};
+    removeFileResult.err = 0;
+    removeFileResult.err.desc = "";
+    var filePathName = './public/products/' + imgName + '.png';
+    fs.unlinkSync(filePathName, function(){
+        fn(removeFileResult);
     });
 }
 
@@ -200,3 +211,4 @@ exports.checkToken = checkToken;
 exports.getToken = getToken;
 exports.extendFbAccessToken = extendFbAccessToken;
 exports.writeImageToFile = writeImageToFile;
+exports.removeImageFile = removeImageFile;

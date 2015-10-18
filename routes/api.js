@@ -25,7 +25,7 @@ router.post("/checktoken", utils.decryptRequest, utils.checkToken, isShopExisted
         send_obj.message = 'checktoken: invalidToken';
         res.send(JSON.stringify(send_obj));
         return;
-    } else {        
+    } else {
         if (req.shop != null || req.shop != undefined) {
             send_obj.shop = req.shop;
             send_obj.isShop = 1;
@@ -55,7 +55,7 @@ router.post("/gettoken", utils.decryptRequest, utils.getToken, utils.extendFbAcc
         send_obj.message = 'checktoken: invalid fb_uid';
         res.send(JSON.stringify(send_obj));
         return;
-    }    
+    }
     if (req.shop != null || req.shop != undefined) {
         send_obj.shop = req.shop;
         send_obj.isShop = 1;
@@ -93,8 +93,8 @@ router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req,
         }
         // Update to ShopManager and write down to database
         dbManager.addShop(update_Obj, function(err, msg) {
-                // console.log("from router.post /createShop:", err, msg);
-            });            
+            // console.log("from router.post /createShop:", err, msg);
+        });
         res.send(JSON.stringify(createShopResult));
         return;
     }
@@ -103,7 +103,7 @@ router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req,
     res.send(JSON.stringify(createShopResult));
 });
 
-router.post('/updateItem',utils.decryptRequest, utils.checkToken, function(req,res,next){
+router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req, res, next) {
     var createItemResult = {};
     createItemResult.err = 0;
     createItemResult.message = "Item is updated successfully";
@@ -113,11 +113,11 @@ router.post('/updateItem',utils.decryptRequest, utils.checkToken, function(req,r
         createItemResult.message = "Cannot create a Item: invalid Request";
         res.send(JSON.stringify(createItemResult));
         return;
-    }    
-    
+    }
+
     dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {
         //1. getShop information to compare pathNaame, fb_uid
-        if(err || obj.fb_uid != req.body.uid|| item.shop != obj.pathName){
+        if (err || obj.fb_uid != req.body.uid || item.shop != obj.pathName) {
             createItemResult.err = 2;
             createItemResult.message = "Cannot create a Item: invalid Shop";
             res.send(JSON.stringify(createItemResult));
@@ -125,41 +125,78 @@ router.post('/updateItem',utils.decryptRequest, utils.checkToken, function(req,r
         }
         //1.b   normalize and validate obj properties
         // a Items
-        if (item.hasOwnProperty('categories') && item.categories.constructor === Array){
-            for(var i = 0; i < item.categories.length; i++){
+        if (item.hasOwnProperty('categories') && item.categories.constructor === Array) {
+            for (var i = 0; i < item.categories.length; i++) {
                 item.categories[i] = trim(item.categories[i]);
             }
-        }else if(!item.categories.constructor === Array){
+        } else if (!item.categories.constructor === Array) {
             createItemResult.err = 3;
             createItemResult.message = "Cannot create a Item: invalid categories type";
             res.send(JSON.stringify(createItemResult));
-            return;   
+            return;
         }
-        
+
         // b Categories
         //2.    update information of Item to Shop          
         var _id = item._productId;
-        
         item._id = _id;
-        
-        dbManager.updateItem(item,function(err, msg){
-            if (err == 1){
+
+        dbManager.updateItem(item, function(err, msg) {
+            if (err == 1) {
                 console.log(err);
                 res.sendStatus(msg);
-            }
-            else{                
+            } else {
                 res.send(JSON.stringify(createItemResult));
             }
         });
     });
 })
 
-function isShopExisted(req, res, next) {    
+router.post('/removeItem', utils.decryptRequest, utils.checkToken, function(req, res, next) {
+    // console.log("from post removeItem");
+    var deleteItemResult = {};
+    deleteItemResult.err = 0;
+    deleteItemResult.message = "Item is deleted successfully";
+    var item = req.body.item;
+    if (!req.isAppToken || !item._productId||!item) {
+        deleteItemResult.err = 1;
+        deleteItemResult.message = "Cannot remove a Item: invalid Request";
+        res.send(JSON.stringify(deleteItemResult));
+        return;
+    }
+    dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {
+        var _id = item._productId;
+        item._id = _id;
+        var imgs = item.imgName;
+
+        for(var i in imgs){
+            try{
+                if(imgs[i]){
+                    utils.removeImageFile(imgs[i]);    
+                }
+            }catch(err){
+                deleteItemResult.err = err;
+            }        
+        }
+
+        dbManager.removeItem(item, function(err, msg) {
+            if (!err==0) {
+                console.log(err, msg);
+                res.sendStatus(msg);
+            } else {
+                res.send(JSON.stringify(deleteItemResult));
+            }
+        });
+    });
+});
+
+
+function isShopExisted(req, res, next) {
     // if(req.body.fromCreateNewShop != 1){
     //     next();
     //     return;
     // }
-    dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {        
+    dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {
         if (obj != null || obj != undefined) {
             req.shop = {};
             for (var i in obj) {
