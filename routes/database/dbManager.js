@@ -214,6 +214,7 @@ function updateItem(updateObj, fn) {
     function f_update() {
         // 
         item_maps.set(updateObj._id.toString(), updateObj);
+        Shop.removeItem(updateObj,function(err,msg){});
         Shop.addItem(updateObj, function(err, msg) {
             if (err) {
                 return fn(err, msg);
@@ -331,3 +332,4 @@ exports.addShop = addShop;
 exports.removeShop = removeShop;
 exports.checkShopWithFb_Uid = checkShopWithFb_Uid;
 exports.item_maps = item_maps;
+exports.shop_maps = shop_maps;

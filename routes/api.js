@@ -103,20 +103,20 @@ router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req,
     res.send(JSON.stringify(createShopResult));
 });
 
-router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req, res, next) {
-    var createItemResult = {};
-    createItemResult.err = 0;
-    createItemResult.message = "Item is updated successfully";
-    var item = req.body.item;
-    if (!req.isAppToken || !item._productId) {
-        createItemResult.err = 1;
-        createItemResult.message = "Cannot create a Item: invalid Request";
-        res.send(JSON.stringify(createItemResult));
-        return;
-    }
+router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req, res, next) {    
 
     dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {
         //1. getShop information to compare pathNaame, fb_uid
+        var createItemResult = {};
+        createItemResult.err = 0;
+        createItemResult.message = "Item is updated successfully";
+        var item = req.body.item;
+        if (!req.isAppToken || !item._productId) {
+            createItemResult.err = 1;
+            createItemResult.message = "Cannot create a Item: invalid Request";
+            res.send(JSON.stringify(createItemResult));
+            return;
+        }
         if (err || obj.fb_uid != req.body.uid || item.shop != obj.pathName) {
             createItemResult.err = 2;
             createItemResult.message = "Cannot create a Item: invalid Shop";
