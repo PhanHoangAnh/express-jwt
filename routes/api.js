@@ -103,7 +103,7 @@ router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req,
     res.send(JSON.stringify(createShopResult));
 });
 
-router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req, res, next) {    
+router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req, res) {    
 
     dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {
         //1. getShop information to compare pathNaame, fb_uid
@@ -135,8 +135,7 @@ router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req,
             res.send(JSON.stringify(createItemResult));
             return;
         }
-
-        // b Categories
+        
         //2.    update information of Item to Shop          
         var _id = item._productId;
         item._id = _id;
@@ -152,7 +151,7 @@ router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req,
     });
 })
 
-router.post('/removeItem', utils.decryptRequest, utils.checkToken, function(req, res, next) {
+router.post('/removeItem', utils.decryptRequest, utils.checkToken, function(req, res) {
     // console.log("from post removeItem");
     var deleteItemResult = {};
     deleteItemResult.err = 0;

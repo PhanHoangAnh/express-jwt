@@ -71,18 +71,31 @@ Shop.addItem = function(item, fn) {
         if(shop.items[i]._id == item._id){
             checkFlag = true
             shop.items[i]= item;
+            break;
         }
     }
-    if(checkFlag==false){
-        shop.items.push(item);
-    }
+    
     if(!(shop.categories&&shop.categories.constructor === Array)||!(item.categories&&item.categories.constructor===Array)){
         if (fn) {
             fn(3, "missing item array of categories");
         }
         return;   
     }
-    shop.categories = arrayUnique(shop.categories, item.categories);
+    if (checkFlag == false) {
+        shop.items.push(item);
+        //update categories for shop
+        shop.categories = arrayUnique(shop.categories, item.categories);
+    }else{
+        for (var i = 0; i < item.categories.length; i++) {
+            // not existed == true
+            if (checkCat_inItems(item.categories[i], shop.items) == true) {
+                shop.categories.splice(shop.categories.indexOf(item.categories[i]), 1);
+                Category.removeItem(item, shop.pathName);
+            } else {
+                Category.removeItem(item);
+            }
+        }
+    }
     shop_maps.set(item.shop, shop);
     setTimeout(function() {
         ShopToDb(shop, true);        
@@ -123,7 +136,7 @@ Shop.removeItem = function(item, fn) {
     }
     // shop.items.splice(pos, 1);
     for (var i = 0; i < item.categories.length; i++) {
-        if (checkCat_inItems(item.categories[i], shop.items) == false) {
+        if (checkCat_inItems(item.categories[i], shop.items) == true) {
             shop.categories.splice(shop.categories.indexOf(item.categories[i]), 1);
             Category.removeItem(item, shop.pathName);
         } else {
@@ -213,8 +226,7 @@ function updateItem(updateObj, fn) {
 
     function f_update() {
         // 
-        item_maps.set(updateObj._id.toString(), updateObj);
-        Shop.removeItem(updateObj,function(err,msg){});
+        item_maps.set(updateObj._id.toString(), updateObj);        
         Shop.addItem(updateObj, function(err, msg) {
             if (err) {
                 return fn(err, msg);
