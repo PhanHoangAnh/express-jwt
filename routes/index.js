@@ -43,6 +43,36 @@ router.get('/', function(req, res, next) {
     });
 });
 
-
+router.get('/:itemNumber',function(req,res,next){
+    var shops = dbManager.shop_maps;
+    var shopName = req.shopName;
+    var shop = shops.get(shopName);
+    if (!shop) {
+        return;
+    }
+    var _id = req.params.itemNumber;
+    var items = dbManager.item_maps;
+    var item = null;
+    if(items.has(_id)){
+        item = items.get(_id);
+        delete item.fb_uid
+    }
+    var similarItems = [];
+    for(var i = 0;i<shop.items.length; i++){
+        for(var j =0;j<item.categories.length;j++){
+            if(shop.items[i].categories.indexOf(item.categories[j]) != -1 && similarItems.indexOf(shop.items[i]) == -1){
+                similarItems.push(shop.items[i]);
+            }
+        }
+    }
+    // console.log(similarItems);
+    res.render('ItemDetails',{
+       data: keyPair.public,
+        title: req.shopName,
+        item: item,
+        shop:shop,
+        similarItems: similarItems
+    });
+});
 
 module.exports = router;

@@ -26,7 +26,7 @@ router.post("/checktoken", utils.decryptRequest, utils.checkToken, isShopExisted
         res.send(JSON.stringify(send_obj));
         return;
     } else {
-        if (req.shop != null || req.shop != undefined) {
+        if (req.shop) {
             send_obj.shop = req.shop;
             send_obj.isShop = 1;
         }
@@ -47,7 +47,7 @@ router.post("/gettoken", utils.decryptRequest, utils.getToken, utils.extendFbAcc
         // res.sendStatus(400);
         send_obj.err = 1;
         send_obj.message = 'checktoken: invalidRequest';
-        res.send(JSON.stringify(send_obj));
+        res.send(JSON.stringify(send_obj));        
         return;
     }
     if (req.body.isValid == false) {
@@ -56,7 +56,7 @@ router.post("/gettoken", utils.decryptRequest, utils.getToken, utils.extendFbAcc
         res.send(JSON.stringify(send_obj));
         return;
     }
-    if (req.shop != null || req.shop != undefined) {
+    if (req.shop) {
         send_obj.shop = req.shop;
         send_obj.isShop = 1;
     }

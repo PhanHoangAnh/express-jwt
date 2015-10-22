@@ -5,15 +5,15 @@ var item_maps = new hashmap();
 var category_maps = new hashmap();
 var dbEngine = require("./dbEngine.js");
 
-function init(){
+function init() {
     var _shop = mongoose.model('Shops');
-    _shop.find({},function(err, shops){
-        shops.forEach( function(s){
-            if(!s.items){
+    _shop.find({}, function(err, shops) {
+        shops.forEach(function(s) {
+            if (!s.items) {
                 s.items = [];
             }
             shop_maps.set(s.pathName, s);
-            for (var i = 0; i < s.items.length; i ++){
+            for (var i = 0; i < s.items.length; i++) {
                 item_maps.set(s.items[i]._id.toString(), s.items[i]);
                 Category.addItem(s.items[i]);
             }
@@ -60,45 +60,47 @@ Shop.addItem = function(item, fn) {
         fn(1, "cannot find a Shop, from Shop.addItem");
     }
 
-    var checkFlag = false;    
-    if (!(shop.items && shop.items.constructor === Array)){
+    var checkFlag = false;
+
+    if (!(shop.items && shop.items.constructor === Array)) {
         if (fn) {
             fn(2, "missing item array of Shop");
         }
         return;
     }
-    for(var i = 0; i< shop.items.length; i++){
-        if(shop.items[i]._id == item._id){
-            checkFlag = true
-            shop.items[i]= item;
+    for (var i = 0; i < shop.items.length; i++) {
+        if (shop.items[i]._id == item._id) {
+            checkFlag = true;
+            var temp_item = shop.items[i];
+            shop.items[i] = item;
             break;
         }
     }
-    
-    if(!(shop.categories&&shop.categories.constructor === Array)||!(item.categories&&item.categories.constructor===Array)){
+
+    if (!(shop.categories && shop.categories.constructor === Array) || !(item.categories && item.categories.constructor === Array)) {
         if (fn) {
             fn(3, "missing item array of categories");
         }
-        return;   
+        return;
     }
     if (checkFlag == false) {
         shop.items.push(item);
-        //update categories for shop
-        shop.categories = arrayUnique(shop.categories, item.categories);
-    }else{
-        for (var i = 0; i < item.categories.length; i++) {
-            // not existed == true
-            if (checkCat_inItems(item.categories[i], shop.items) == true) {
-                shop.categories.splice(shop.categories.indexOf(item.categories[i]), 1);
-                Category.removeItem(item, shop.pathName);
+        //update categories for shop        
+    } else {
+        for (var i = 0; i < temp_item.categories.length; i++) {
+            // not existed == false
+            if (checkCat_inItems(temp_item.categories[i], shop.items) == false) {
+                shop.categories.splice(shop.categories.indexOf(temp_item.categories[i]), 1);
+                Category.removeItem(temp_item, shop.pathName);
             } else {
-                Category.removeItem(item);
+                Category.removeItem(temp_item);
             }
         }
     }
+    shop.categories = arrayUnique(shop.categories, item.categories);
     shop_maps.set(item.shop, shop);
     setTimeout(function() {
-        ShopToDb(shop, true);        
+        ShopToDb(shop, true);
     }, 200);
     if (fn) {
         fn(null, "item is added successfully");
@@ -111,32 +113,32 @@ Shop.removeItem = function(item, fn) {
         }
         return;
     }
-    var shop = shop_maps.get(item.shop);    
-    if(!(shop.items&&shop.items.constructor===Array)||!(shop.items&&shop.items.constructor===Array)||!(shop.categories&&shop.categories.constructor===Array)){
-      if (fn) {
+    var shop = shop_maps.get(item.shop);
+    if (!(shop.items && shop.items.constructor === Array) || !(shop.items && shop.items.constructor === Array) || !(shop.categories && shop.categories.constructor === Array)) {
+        if (fn) {
             fn(2, 'invalid shop properties');
         }
-        return;  
+        return;
     }
     var _item;
-    for(var i = 0; i< shop.items.length; i++){
-        if(shop.items[i]._id == item._id){
+    for (var i = 0; i < shop.items.length; i++) {
+        if (shop.items[i]._id == item._id) {
             checkFlag = true
-            // shop.items[i]= item;
+                // shop.items[i]= item;
             _item = shop[i];
             var pos = shop.items.indexOf(item);
             shop.items.splice(pos, 1);
         }
     }
-    if(!item ||!(item.categories&&item.categories.constructor === Array)){
+    if (!item || !(item.categories && item.categories.constructor === Array)) {
         if (fn) {
             fn(3, 'invalid item');
         }
-        return;     
+        return;
     }
     // shop.items.splice(pos, 1);
     for (var i = 0; i < item.categories.length; i++) {
-        if (checkCat_inItems(item.categories[i], shop.items) == true) {
+        if (checkCat_inItems(item.categories[i], shop.items) == false) {
             shop.categories.splice(shop.categories.indexOf(item.categories[i]), 1);
             Category.removeItem(item, shop.pathName);
         } else {
@@ -146,7 +148,7 @@ Shop.removeItem = function(item, fn) {
     if (fn) {
         fn(0, null);
     }
-    // update to database    
+    // update to database
     setTimeout(function() {
         ShopToDb(shop, true);
     }, 200);
@@ -226,10 +228,14 @@ function updateItem(updateObj, fn) {
 
     function f_update() {
         // 
-        item_maps.set(updateObj._id.toString(), updateObj);        
+        item_maps.set(updateObj._id.toString(), updateObj);
         Shop.addItem(updateObj, function(err, msg) {
             if (err) {
                 return fn(err, msg);
+            } else {
+                for (var i = 0; i < shop_funcs_stack.length; i++) {
+                    shop_funcs_stack[i].call(shop_maps);
+                }
             }
         });
         Category.removeItem(updateObj, updateObj.shop);
@@ -249,6 +255,11 @@ function removeItem(item, fn) {
     Shop.removeItem(item, function(err, msg) {
         if (fn) {
             fn(err, msg);
+        }
+        if (err == 0) {
+            for (var i = 0; i < shop_funcs_stack.length; i++) {
+                shop_funcs_stack[i].call(shop_maps);
+            }
         }
     });
 
@@ -273,6 +284,9 @@ function addShop(shop, fn) {
             fn(null, objs);
             return;
         }
+        for (var i = 0; i < shop_funcs_stack.length; i++) {
+            shop_funcs_stack[i].call(shop_maps);
+        }
     });
 }
 
@@ -282,6 +296,9 @@ function removeShop(shop, fn) {
     }
     shop_maps.remove(shop.pathName);
     // update to database
+    for (var i = 0; i < shop_funcs_stack.length; i++) {
+        shop_funcs_stack[i].call(shop_maps);
+    }
 }
 
 function ShopToDb(shop, isUpdate, fn) {
@@ -299,13 +316,13 @@ function ShopToDb(shop, isUpdate, fn) {
             }
         });
     } else {
-        Shop.findById(shop._id, function(err, sh) {            
+        Shop.findById(shop._id, function(err, sh) {
             if (err && fn) {
                 fn(2, err);
                 return;
             }
             // sh = shop;            
-            for(var i in shop){
+            for (var i in shop) {
                 sh[i] = shop[i];
             }
             sh.markModified('items');
@@ -328,7 +345,7 @@ function checkShopWithFb_Uid(_uid, cb) {
     var Shop = mongoose.model('Shops');
     Shop.findOne({
         fb_uid: _uid
-    }, function(err, obj) {        
+    }, function(err, obj) {
         if (obj) {
             cb(0, obj.toObject());
             return true;
@@ -338,6 +355,15 @@ function checkShopWithFb_Uid(_uid, cb) {
     });
 }
 
+var shop_funcs_stack = [];
+
+function addShopListener(func) {
+    if (!func || typeof func !== "function") {
+        return;
+    }
+    shop_funcs_stack.push(func);
+}
+
 exports.updateItem = updateItem;
 exports.removeItem = removeItem;
 exports.addShop = addShop;
@@ -345,3 +371,4 @@ exports.removeShop = removeShop;
 exports.checkShopWithFb_Uid = checkShopWithFb_Uid;
 exports.item_maps = item_maps;
 exports.shop_maps = shop_maps;
+exports.addShopListener = addShopListener;
