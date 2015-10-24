@@ -20,6 +20,10 @@ router.get('/', function(req, res, next) {
         obj[base_infos[i]] = shop[base_infos[i]];
     }
     var items = shop.items;
+    if(items.constructor !== Array){
+        res.sendStatus(500);
+        return;
+    }
     var hot_items = [];
     var new_items = [];
     for (var i = 0; i < items.length; i++) {
@@ -42,8 +46,7 @@ router.get('/', function(req, res, next) {
         shop: obj
     });
 });
-
-router.get('/:itemNumber',function(req,res,next){
+router.get('/similar/:itemNumber',function(req,res,next){
     var shops = dbManager.shop_maps;
     var shopName = req.shopName;
     var shop = shops.get(shopName);
@@ -65,12 +68,44 @@ router.get('/:itemNumber',function(req,res,next){
             }
         }
     }
+    res.send(JSON.stringify(similarItems));
+
+})
+
+router.get('/:itemNumber',function(req,res,next){
+    var shops = dbManager.shop_maps;
+    var shopName = req.shopName;
+    var shop = shops.get(shopName);
+    if (!shop) {
+        return;
+    }
+    var obj = {};
+    var base_infos = ['_id','address', 'companyName', 'contact_email', 'contact_phone', 'pathName', 'shop_description', 'showName', 'slogan', 'longitude', 'latitude', 'walls', 'avatars', 'categories'];
+    for (var i = 0; i < base_infos.length; i++) {
+        obj[base_infos[i]] = shop[base_infos[i]];
+    }
+    
+    var _id = req.params.itemNumber;
+    var items = dbManager.item_maps;
+    var item = null;
+    if(items.has(_id)){
+        item = items.get(_id);
+        delete item.fb_uid
+    }
+    var similarItems = [];
+    for(var i = 0;i<shop.items.length; i++){
+        for(var j =0;j<item.categories.length;j++){
+            if(shop.items[i].categories.indexOf(item.categories[j]) != -1 && similarItems.indexOf(shop.items[i]) == -1){
+                similarItems.push(shop.items[i]);
+            }
+        }
+    }
     // console.log(similarItems);
     res.render('ItemDetails',{
        data: keyPair.public,
         title: req.shopName,
         item: item,
-        shop:shop,
+        shop: obj,
         similarItems: similarItems
     });
 });

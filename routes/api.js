@@ -47,7 +47,7 @@ router.post("/gettoken", utils.decryptRequest, utils.getToken, utils.extendFbAcc
         // res.sendStatus(400);
         send_obj.err = 1;
         send_obj.message = 'checktoken: invalidRequest';
-        res.send(JSON.stringify(send_obj));        
+        res.send(JSON.stringify(send_obj));
         return;
     }
     if (req.body.isValid == false) {
@@ -103,7 +103,7 @@ router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req,
     res.send(JSON.stringify(createShopResult));
 });
 
-router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req, res) {    
+router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req, res) {
 
     dbManager.checkShopWithFb_Uid(req.body.uid, function(err, obj) {
         //1. getShop information to compare pathNaame, fb_uid
@@ -135,7 +135,7 @@ router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req,
             res.send(JSON.stringify(createItemResult));
             return;
         }
-        
+
         //2.    update information of Item to Shop          
         var _id = item._productId;
         item._id = _id;
@@ -157,7 +157,7 @@ router.post('/removeItem', utils.decryptRequest, utils.checkToken, function(req,
     deleteItemResult.err = 0;
     deleteItemResult.message = "Item is deleted successfully";
     var item = req.body.item;
-    if (!req.isAppToken || !item._productId||!item) {
+    if (!req.isAppToken || !item._productId || !item) {
         deleteItemResult.err = 1;
         deleteItemResult.message = "Cannot remove a Item: invalid Request";
         res.send(JSON.stringify(deleteItemResult));
@@ -168,18 +168,25 @@ router.post('/removeItem', utils.decryptRequest, utils.checkToken, function(req,
         item._id = _id;
         var imgs = item.imgName;
 
-        for(var i in imgs){
-            try{
-                if(imgs[i]){
-                    utils.removeImageFile(imgs[i]);    
+        if (err || (obj.fb_uid != req.body.uid)) {
+            deleteItemResult.err = 2;
+            deleteItemResult.message = "Invalid fb_uid: Cannot delete item";
+            res.send(JSON.stringify(deleteItemResult));
+            return;
+        }
+
+        for (var i in imgs) {
+            try {
+                if (imgs[i]) {
+                    utils.removeImageFile(imgs[i]);
                 }
-            }catch(err){
+            } catch (err) {
                 deleteItemResult.err = err;
-            }        
+            }
         }
 
         dbManager.removeItem(item, function(err, msg) {
-            if (!err==0) {
+            if (!err == 0) {
                 console.log(err, msg);
                 res.sendStatus(msg);
             } else {
