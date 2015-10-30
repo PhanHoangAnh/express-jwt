@@ -126,7 +126,7 @@ function extendFbAccessToken(req, res, next) {
             // console.log("wrong fb_key");
             next();
             return;
-        }
+        }        
         var obj = new MemberHandler();
         obj.fb_uid = fb_uid;
         obj.longFb_token = results.access_token;

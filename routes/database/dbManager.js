@@ -232,16 +232,12 @@ function updateItem(updateObj, fn) {
         Shop.addItem(updateObj, function(err, msg) {
             if (err) {
                 return fn(err, msg);
-            } else {
-                for (var i = 0; i < shop_funcs_stack.length; i++) {
-                    shop_funcs_stack[i].call(shop_maps);
-                }
-            }
+            } 
         });
         Category.removeItem(updateObj, updateObj.shop);
         Category.addItem(updateObj);
         if (fn) {
-            return fn(shop_maps, item_maps, category_maps);
+            return fn(null, "okie");
         }
     }
 }
@@ -255,11 +251,6 @@ function removeItem(item, fn) {
     Shop.removeItem(item, function(err, msg) {
         if (fn) {
             fn(err, msg);
-        }
-        if (err == 0) {
-            for (var i = 0; i < shop_funcs_stack.length; i++) {
-                shop_funcs_stack[i].call(shop_maps);
-            }
         }
     });
 
@@ -275,18 +266,15 @@ function addShop(shop, fn) {
             shop._id = mongoose.Types.ObjectId();
             shop_maps.set(shop.pathName, shop);
             fn(null, null);
-            // update to database
-            ShopToDb(shop, false);
+            // update to database            
         } else {
             shop._id = objs._id;
-            shop_maps.set(objs.pathName, shop);
+            // shop_maps.set(objs.pathName, shop);
             ShopToDb(shop, true);
             fn(null, objs);
             return;
         }
-        for (var i = 0; i < shop_funcs_stack.length; i++) {
-            shop_funcs_stack[i].call(shop_maps);
-        }
+        ShopToDb(shop, false);
     });
 }
 
@@ -296,9 +284,6 @@ function removeShop(shop, fn) {
     }
     shop_maps.remove(shop.pathName);
     // update to database
-    for (var i = 0; i < shop_funcs_stack.length; i++) {
-        shop_funcs_stack[i].call(shop_maps);
-    }
 }
 
 function ShopToDb(shop, isUpdate, fn) {
@@ -332,6 +317,7 @@ function ShopToDb(shop, isUpdate, fn) {
                     fn(3, error);
                     return;
                 }
+            shop_maps.set(sh.pathName,sh);
             })
         });
     }
@@ -355,14 +341,6 @@ function checkShopWithFb_Uid(_uid, cb) {
     });
 }
 
-var shop_funcs_stack = [];
-
-function addShopListener(func) {
-    if (!func || typeof func !== "function") {
-        return;
-    }
-    shop_funcs_stack.push(func);
-}
 
 exports.updateItem = updateItem;
 exports.removeItem = removeItem;
@@ -371,4 +349,3 @@ exports.removeShop = removeShop;
 exports.checkShopWithFb_Uid = checkShopWithFb_Uid;
 exports.item_maps = item_maps;
 exports.shop_maps = shop_maps;
-exports.addShopListener = addShopListener;

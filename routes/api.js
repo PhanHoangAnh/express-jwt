@@ -4,7 +4,6 @@ var utils = require('./middlewares/utils.js');
 var hmap = utils.hmap;
 var hashmap = require("hashmap");
 var dbManager = require("./database/dbManager.js");
-var mongoose = require('mongoose');
 var trim = require('trim');
 
 router.get('/', function(req, res, next) {
@@ -93,14 +92,14 @@ router.post("/createShop", utils.decryptRequest, utils.checkToken, function(req,
         }
         // Update to ShopManager and write down to database
         dbManager.addShop(update_Obj, function(err, msg) {
-            // console.log("from router.post /createShop:", err, msg);
-        });
-        res.send(JSON.stringify(createShopResult));
+            createShopResult.err = err;
+            res.send(JSON.stringify(createShopResult));    
+        });        
         return;
     }
-    createShopResult.err = 2;
-    createShopResult.message = "Cannot create a Shop: unknown reasons";
-    res.send(JSON.stringify(createShopResult));
+    // createShopResult.err = 2;
+    // createShopResult.message = "Cannot create a Shop: unknown reasons";
+    // res.send(JSON.stringify(createShopResult));
 });
 
 router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req, res) {
@@ -141,9 +140,9 @@ router.post('/updateItem', utils.decryptRequest, utils.checkToken, function(req,
         item._id = _id;
 
         dbManager.updateItem(item, function(err, msg) {
-            if (err == 1) {
+            if (err) {
                 console.log(err);
-                res.sendStatus(msg);
+                res.send(JSON.stringify(err));
             } else {
                 res.send(JSON.stringify(createItemResult));
             }
@@ -188,7 +187,9 @@ router.post('/removeItem', utils.decryptRequest, utils.checkToken, function(req,
         dbManager.removeItem(item, function(err, msg) {
             if (!err == 0) {
                 console.log(err, msg);
-                res.sendStatus(msg);
+                deleteItemResult.err = err;
+                deleteItemResult.message = msg;
+                res.send(JSON.stringify(deleteItemResult));
             } else {
                 res.send(JSON.stringify(deleteItemResult));
             }
