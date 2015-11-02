@@ -7,8 +7,6 @@ var config = require('./middlewares/config.js');
 var utils = require('./middlewares/utils.js');
 var dbManager = require("./database/dbManager.js");
 var hashmap = require('hashmap');
-var orderMap_fromId = new hashmap;
-var orderMap_fromShop = new hashmap;
 
 keyPair = config.keyPair;
 var APP_ID = '203172309854130';
@@ -42,9 +40,10 @@ router.get('/similar/:itemNumber', function(req, res, next) {
 
 });
 
-router.get('/orderList',function(req, res, next){
+router.get('/cartReview', function(req, res, next) {
     var shops = dbManager.shop_maps;
     var shopName = req.shopName;
+    orderId = 'orderId_' + mongoose.Types.ObjectId();
     var shop = shops.get(shopName);
     if (!shop) {
         return;
@@ -55,35 +54,79 @@ router.get('/orderList',function(req, res, next){
     for (var i = 0; i < base_infos.length; i++) {
         obj[base_infos[i]] = shop[base_infos[i]];
     }
-   res.render('orderList.ejs', {
+    res.render('cartReview.ejs', {
         data: keyPair.public,
         title: req.shopName,
-        // item: item,
-        shop: obj,
-        // similarItems: similarItems
-    }); 
+        shop: obj
+    });
 });
 
-router.get('/orderList/:orderId',function(req,res,next){
+router.get('/order/:orderId', function(req, res, next) {
+    var orderResult = {};
+    orderResult.err = 0;
+    orderResult.msg = "Ok";    
+    var orderId = req.params.orderId;
+    var orderLists = order_fromOrderId.get(orderId);
+    orderResult.orderLists = orderLists;
+    res.send(JSON.stringify(orderResult));
+});
+
+var order_fromOrderId = new hashmap;
+var order_fromFb_uid = new hashmap;
+var order_toShop = new hashmap;
+var translateOrderId_toUid = new hashmap;
+
+router.post('/order', utils.decryptRequest, utils.checkToken, function(req, res, next) {
     var shops = dbManager.shop_maps;
     var shopName = req.shopName;
     var shop = shops.get(shopName);
     if (!shop) {
         return;
     }
-
-    var obj = {};
-    var base_infos = ['_id', 'address', 'companyName', 'contact_email', 'contact_phone', 'pathName', 'shop_description', 'showName', 'slogan', 'longitude', 'latitude', 'walls', 'avatars', 'categories'];
-    for (var i = 0; i < base_infos.length; i++) {
-        obj[base_infos[i]] = shop[base_infos[i]];
+    var orderResult = {};
+    orderResult.err = 0;
+    orderResult.msg = "Ok";
+    var orderId = req.body.orderId;
+    var cartItems = JSON.parse(req.body.cartItems);
+    
+    if (cartItems.constructor !== Array) {
+        orderResult.err = 1;
+        orderResult.msg = "invalidRequest: cartItems is not array";
+        res.send(JSON.stringify(orderResult));
+        return
     }
-   res.render('orderList.ejs', {
-        data: keyPair.public,
-        title: req.shopName,
-        // item: item,
-        shop: obj,
-        // similarItems: similarItems
-    }); 
+    for(var i = 0; i<cartItems.length; i++){
+    	cartItems[i].date = Date();
+    	cartItems[i].status = "Waiting.."
+    }
+    if (req.invalidRequest == false && req.isAppToken == true) {
+        // Object send from an identified person.Add information of order within detail of buyer
+        translateOrderId_toUid.set(orderId, req.uid);
+        var orderLists = order_fromFb_uid.get(req.uid)
+        if (orderLists) {
+            orderLists = orderLists.concat(cartItems);
+        } else {
+            orderLists = cartItems;
+        }
+        order_fromFb_uid.set(req.uid, orderLists);
+    };
+    var _orderLists = order_fromOrderId.get(orderId);
+    if (_orderLists) {
+        _orderLists = _orderLists.concat(cartItems);
+    } else {
+        _orderLists = cartItems;
+    };
+    order_fromOrderId.set(orderId, _orderLists);
+
+    var orderToShop = order_toShop.get(shopName);
+    if (orderToShop) {
+        orderToShop = orderToShop.concat(cartItems);
+    } else {
+        orderToShop = cartItems;
+    }
+    order_toShop.set(shopName, orderToShop);
+    res.send(JSON.stringify(orderResult));
+
 });
 
 router.get('/item/:itemNumber', function(req, res, next) {
@@ -125,20 +168,8 @@ router.get('/item/:itemNumber', function(req, res, next) {
     });
 });
 
-router.post('/order', utils.decryptRequest, utils.checkToken, function(req, res, next) {
-    var orderResult = {};
-    orderResult.err = 0;
-    orderResult.msg = "Ok";
-    if (req.invalidRequest == true || req.isAppToken == false) {
-        // Object send from an annonymous person
-        // Just add information of order without detail of buyer
-        return;
-    }
-
-});
-
 router.get('/', function(req, res, next) {
-    orderId = 'orderId'+ mongoose.Types.ObjectId();
+    orderId = 'orderId_' + mongoose.Types.ObjectId();
     var shops = dbManager.shop_maps;
     var shopName = req.shopName;
     var shop = shops.get(shopName);
@@ -152,8 +183,8 @@ router.get('/', function(req, res, next) {
         obj[base_infos[i]] = shop[base_infos[i]];
     }
     var items = shop.items;
-    
-    if (!items||items.constructor !== Array) {
+
+    if (!items || items.constructor !== Array) {
         res.sendStatus(500);
         return;
     }
