@@ -57,9 +57,16 @@ router.get('/cartReview', function(req, res, next) {
     res.render('cartReview.ejs', {
         data: keyPair.public,
         title: req.shopName,
-        shop: obj
+        shop: obj,
+        orderId: orderId
     });
 });
+
+
+var order_fromOrderId = new hashmap;
+var order_fromFb_uid = new hashmap;
+var order_toShop = new hashmap;
+var translateOrderId_toUid = new hashmap;
 
 router.get('/order/:orderId', function(req, res, next) {
     var orderResult = {};
@@ -71,18 +78,8 @@ router.get('/order/:orderId', function(req, res, next) {
     res.send(JSON.stringify(orderResult));
 });
 
-var order_fromOrderId = new hashmap;
-var order_fromFb_uid = new hashmap;
-var order_toShop = new hashmap;
-var translateOrderId_toUid = new hashmap;
-
-router.post('/order', utils.decryptRequest, utils.checkToken, function(req, res, next) {
-    var shops = dbManager.shop_maps;
-    var shopName = req.shopName;
-    var shop = shops.get(shopName);
-    if (!shop) {
-        return;
-    }
+router.post('/order', utils.decryptRequest, utils.checkToken, function(req, res, next) {    
+    var shops = dbManager.shop_maps;    
     var orderResult = {};
     orderResult.err = 0;
     orderResult.msg = "Ok";
@@ -95,10 +92,34 @@ router.post('/order', utils.decryptRequest, utils.checkToken, function(req, res,
         res.send(JSON.stringify(orderResult));
         return
     }
+
     for(var i = 0; i<cartItems.length; i++){
+        var shop = cartItems[i].shop;
+        if(!shops.get(shop)){
+            cartItems.splice(indexOf(cartItems[i]),1);
+            console.log('here', cartItems[i]);
+            continue;
+        }
+        var orderToShop = order_toShop.get(shop);
+        if (orderToShop) {
+            orderToShop = orderToShop.concat(cartItems[i]);
+        } else {
+            orderToShop = [cartItems[i]];
+        }
+        order_toShop.set(shop, orderToShop);
     	cartItems[i].date = Date();
     	cartItems[i].status = "Waiting.."
     }
+    function orderOfShopToDb(shop, cartItemArrays, fn) {}
+    order_toShop.forEach(function(value, key){
+        dbManager.orderOfShopToDb(key,value, function(result){
+            if(result.err){
+                // Log
+                console.log(result);
+            }
+        })
+    });
+
     if (req.invalidRequest == false && req.isAppToken == true) {
         // Object send from an identified person.Add information of order within detail of buyer
         translateOrderId_toUid.set(orderId, req.uid);
@@ -110,23 +131,25 @@ router.post('/order', utils.decryptRequest, utils.checkToken, function(req, res,
         }
         order_fromFb_uid.set(req.uid, orderLists);
     };
+
     var _orderLists = order_fromOrderId.get(orderId);
+    // function orderToDb(orderId,cartItemArrays, fn){}
     if (_orderLists) {
         _orderLists = _orderLists.concat(cartItems);
     } else {
         _orderLists = cartItems;
     };
-    order_fromOrderId.set(orderId, _orderLists);
+    order_fromOrderId.set(orderId, _orderLists);    
 
-    var orderToShop = order_toShop.get(shopName);
-    if (orderToShop) {
-        orderToShop = orderToShop.concat(cartItems);
-    } else {
-        orderToShop = cartItems;
-    }
-    order_toShop.set(shopName, orderToShop);
+    dbManager.orderToDb(orderId,_orderLists,function(result){
+        if (!result.err){
+            // Write to logfiles   
+            return;
+        }
+    });
+    orderResult.orderLists = _orderLists;
+    orderResult.history = order_fromOrderId;
     res.send(JSON.stringify(orderResult));
-
 });
 
 router.get('/item/:itemNumber', function(req, res, next) {
@@ -213,11 +236,5 @@ router.get('/', function(req, res, next) {
     });
 });
 
-// function checkShopMapsChanged(map){
-//     if(map){
-//         console.log("changed",map);
-//     }
-// }
-// dbManager.addShopListener(checkShopMapsChanged);
 
 module.exports = router;

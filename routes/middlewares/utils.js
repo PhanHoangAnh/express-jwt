@@ -132,7 +132,7 @@ function extendFbAccessToken(req, res, next) {
         obj.longFb_token = results.access_token;
         obj.shortFb_token = fb_token;
         var app_token = jwt.sign(obj, superSecret, {
-            expiresInMinutes: 2880 // expires in 48 hours
+            expiresIn: 2880*60 // expires in 48 hours
         });
         obj.app_token = app_token;
         map.set(fb_uid, obj);

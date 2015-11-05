@@ -232,7 +232,7 @@ function updateItem(updateObj, fn) {
         Shop.addItem(updateObj, function(err, msg) {
             if (err) {
                 return fn(err, msg);
-            } 
+            }
         });
         Category.removeItem(updateObj, updateObj.shop);
         Category.addItem(updateObj);
@@ -317,7 +317,7 @@ function ShopToDb(shop, isUpdate, fn) {
                     fn(3, error);
                     return;
                 }
-            shop_maps.set(sh.pathName,sh);
+                shop_maps.set(sh.pathName, sh);
             })
         });
     }
@@ -342,6 +342,113 @@ function checkShopWithFb_Uid(_uid, cb) {
 }
 
 
+function orderToDb(orderId, cartItemArrays, fn) {
+    var orderToDbResult = {};
+    orderToDbResult.err = null;
+    orderToDbResult.msg = "Ok";
+    orderId = orderId.replace("orderId_", '');
+
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+        orderToDbResult.err = 1;
+        orderToDbResult.msg = "Invalid orderId";
+        fn(orderToDbResult);
+        return;
+    }
+    
+    var Orders = mongoose.model('Orders');
+    Orders.findById(orderId, function(err, obj) {
+        if (!obj) {
+            _order = new Orders();
+            _order._id = orderId;
+            _order.items = cartItemArrays;
+            _order.markModified('_id');
+            _order.markModified('items');
+            _order.save(function(err) {
+                if (err) {
+                    orderToDbResult.err = 2;
+                    orderToDbResult.msg = err;
+                    fn(orderToDbResult);
+                    return;
+                } else {
+                    fn(orderToDbResult);
+                }
+            })
+        } else {
+            obj.items = cartItemArrays;
+            obj.markModified("items");
+            obj.save(function(err) {
+                if (err) {
+                    orderToDbResult.err = 3;
+                    orderToDbResult.msg = err;
+                    fn(orderToDbResult);
+                    return;
+                } else {
+                    fn(orderToDbResult);
+                }
+            })
+        }
+    });
+}
+
+function orderOfShopToDb(shopPathName, cartItemArrays, fn) {
+    var orderOfShopToDbResult = {};
+    orderOfShopToDbResult.err = null;
+    orderOfShopToDbResult.msg = "Ok";
+    var shop = shop_maps.get(shopPathName);
+    var id = shop._id;
+    // if (!mongoose.Types.ObjectId.isValid(id)) {
+    //     orderOfShopToDbResult.err = 1;
+    //     orderOfShopToDbResult.msg = "Invalid shopId";
+    //     fn(orderOfShopToDbResult);
+    //     return;
+    // }
+    var OrderToShops = mongoose.model('OrderToShops');
+    OrderToShops.findById(id, function(err, obj) {
+        if (!obj) {
+            order_toShop = new OrderToShops();
+            order_toShop._id = id;
+            order_toShop.shop = shopPathName;
+            order_toShop.items = cartItemArrays;
+            order_toShop.save(function(err) {
+                if (err) {
+                    orderOfShopToDbResult.err = 2;
+                    orderOfShopToDbResult.msg = err;
+                    fn(orderOfShopToDbResult);
+                    return;
+                } else {
+                    fn(orderOfShopToDbResult);
+                }
+            })
+        } else {
+            obj.shop = shopPathName;
+            obj.markModified('items');
+            obj.items = cartItemArrays;
+            obj.save(function(err) {
+                if (err) {
+                    orderOfShopToDbResult.err = 3;
+                    orderOfShopToDbResult.msg = err;
+                    fn(orderOfShopToDbResult);
+                    return;
+                } else {
+                    fn(orderOfShopToDbResult);
+                }
+            })
+        }
+    })
+}
+
+function translateIdToDb(orderId, fb_uid) {
+    var translateIdToDbResult = {};
+    translateIdToDbResult.err = null;
+    translateIdToDbResult.msg = "Ok";
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+        translateIdToDbResult.err = 1;
+        translateIdToDbResult.msg = "Invalid orderId";
+        return;
+    }
+
+}
+
 exports.updateItem = updateItem;
 exports.removeItem = removeItem;
 exports.addShop = addShop;
@@ -349,3 +456,6 @@ exports.removeShop = removeShop;
 exports.checkShopWithFb_Uid = checkShopWithFb_Uid;
 exports.item_maps = item_maps;
 exports.shop_maps = shop_maps;
+exports.orderToDb = orderToDb;
+exports.orderOfShopToDb = orderOfShopToDb;
+exports.translateIdToDb = translateIdToDb;
