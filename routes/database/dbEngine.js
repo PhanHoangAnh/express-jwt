@@ -5,12 +5,12 @@ var Schema = mongoose.Schema;
 
 var Shop_schema = new Schema({
     _id             : Schema.Types.ObjectId,
-    fb_uid          : { type : String , unique : true, required : true, dropDups: true },
+    fb_uid          : { type : String , unique : true, required : true, dropDups: true, index: true },
     avatars         : String,
     walls           : String,
     longitude       : String,
     latitude        : String,
-    pathName        : { type : String , unique : true, required : true, dropDups: true },
+    pathName        : { type : String , unique : true, required : true, dropDups: true , index: true },
     showName        : String,
     slogan          : String,
     companyName     : String,
@@ -35,22 +35,22 @@ var Order_schema = new Schema({
 var OrderToShops_schema = new Schema({
     // _id is Shop id
     _id         : Schema.Types.ObjectId,
-    shop        : String,
-    items       : [Schema.Types.Mixed],
+    shop        : { type : String , required : true, index: true },
+    orders       : [Schema.Types.Mixed],
     time        : { type: Date, default: Date.now }
 });
 
 var TranslateOrderIdToFbUid_schema = new Schema({
     // _id is orderID
-    _id         :Schema.Types.ObjectId,
-    fb_uid      :String
+    _id         : Schema.Types.ObjectId,
+    fb_uid      : { type : String , required : true, index: true },
 });
 
 var OrderOfFbUid_schema = new Schema({
-    // _id = fb_uid
-    _id     : Schema.Types.ObjectId,
+    _id         : Schema.Types.ObjectId,
+    fb_uid      : { type : String , unique : true, required : true, dropDups: true, index: true },
     items       : [Schema.Types.Mixed],
-    time        : String  
+    time        : { type: Date, default: Date.now }
 });
 
 mongoose.connect('mongodb://localhost/virtualMarket');
